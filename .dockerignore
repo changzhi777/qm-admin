@@ -1,0 +1,15 @@
+# 排除构建产物 / 依赖（让 Docker context 干净）
+node_modules
+.umi
+.umi-production
+dist
+build
+.git
+.gitignore
+.dockerignore
+.DS_Store
+*.log
+README.md
+.env*
+.vscode
+.idea
