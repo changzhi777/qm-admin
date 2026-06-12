@@ -1,0 +1,94 @@
+# qm-admin CI — Gitea Actions（语法兼容 GitHub Actions）
+#
+# 触发：push 到 main、PR 到 main、手动
+# 阶段：
+#   1. lint-typecheck：装依赖 + max setup + tsc --noEmit
+#   2. build：max build 生成 dist/
+#   3. docker-image：构建镜像，可选 push 到 Gitea Container Registry
+#
+# 启用前置：
+# - Gitea 全局 [actions] ENABLED=true（修 /etc/gitea/app.ini 后重启）
+# - repo Settings → Actions → enable
+# - 装 act_runner 注册到 Gitea
+#
+# 详见 .gitea/RUNNER-SETUP.md
+
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  lint-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Umi setup（生成 .umi/exports.ts）
+        run: npx max setup
+
+      - name: Typecheck
+        run: npm run typecheck
+
+  build:
+    runs-on: ubuntu-latest
+    needs: lint-typecheck
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci --prefer-offline --no-audit --no-fund
+      - run: npx max setup
+      - name: Build
+        run: npm run build
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qm-admin-dist
+          path: dist/
+          retention-days: 7
+
+  docker-image:
+    runs-on: ubuntu-latest
+    needs: build
+    # 仅 main 分支 push 时构镜像
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Gitea Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.GITEA_REGISTRY || '10.10.10.4:3000' }}
+          username: ${{ secrets.GITEA_USERNAME }}
+          password: ${{ secrets.GITEA_TOKEN }}
+
+      - name: Build & Push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ vars.GITEA_REGISTRY || '10.10.10.4:3000' }}/qingmu/qm-admin:latest
+            ${{ vars.GITEA_REGISTRY || '10.10.10.4:3000' }}/qingmu/qm-admin:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
