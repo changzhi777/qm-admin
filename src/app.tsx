@@ -14,8 +14,17 @@ import type { InitialState } from '@/types/app';
 export async function getInitialState(): Promise<InitialState> {
   const token = localStorage.getItem('qm_admin_token');
   const userRaw = localStorage.getItem('qm_admin_user');
-  const user = userRaw ? JSON.parse(userRaw) : null;
-  return { token, user };
+  let user = null;
+  try {
+    user = userRaw ? JSON.parse(userRaw) : null;
+  } catch {
+    // 老格式或损坏 → 视为未登录
+    localStorage.removeItem('qm_admin_user');
+  }
+  // 登录页本身不做白名单验证（用户还在填表）
+  // 已登录态：信任登录时已校验过的 isAdmin（true）
+  const isAdmin = Boolean(token && user);
+  return { token, user, isAdmin };
 }
 
 /** ProLayout 钩子（顶栏 / 侧栏 / 退出菜单） */
@@ -39,7 +48,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         onClick={() => {
           localStorage.removeItem('qm_admin_token');
           localStorage.removeItem('qm_admin_user');
-          setInitialState({ token: null, user: null } as InitialState);
+          setInitialState({ token: null, user: null, isAdmin: false } as InitialState);
           history.push('/login');
         }}
       >
