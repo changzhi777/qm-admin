@@ -142,6 +142,18 @@ docker run -d --restart=always --name qm-admin \
 - **HEALTHCHECK** 内置（30s 间隔 wget `/`）
 - **gzip + 1y 静态资源缓存**：nginx 配置已开
 
+## CI（Gitea Actions）
+
+`.gitea/workflows/ci.yml` 已就位：
+
+| Job | 触发 | 内容 |
+| --- | --- | --- |
+| `lint-typecheck` | push/PR/手动 | install → max setup → tsc --noEmit |
+| `build` | push/PR/手动 | install → max setup → max build，产物 upload artifact |
+| `docker-image` | 仅 main 分支 push | build & push 到 Gitea Container Registry |
+
+> ⚠️ CT400 Gitea 默认未启用 Actions，启用步骤见 [.gitea/RUNNER-SETUP.md](./.gitea/RUNNER-SETUP.md)。
+
 ## 开发笔记
 
 - **tsconfig paths**：`@umijs/max` 同时映射 `src/.umi/exports.ts`（运行时）和 `node_modules/umi`（构建时）
