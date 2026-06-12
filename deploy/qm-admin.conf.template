@@ -1,12 +1,16 @@
-# qm-admin nginx 配置
+# qm-admin nginx 配置模板（envsubst 处理）
+#
+# 通过 nginx:1.27-alpine 内置的 /docker-entrypoint.d/20-envsubst-on-templates.sh
+# 自动渲染：${VAR} → 环境变量值
+#
+# 环境变量：
+# - BACKEND_URL  后端 API 地址（如 http://qm-server:3000 或 http://10.0.0.5:3000）
+#                未设时默认 http://host.docker.internal:3000（Mac/Win Docker Desktop）
 #
 # 职责：
 # - 静态资源托管（带长效缓存）
 # - SPA history 模式 fallback 到 index.html
 # - /api/* 反代到后端 Fastify server
-#
-# 后端地址由环境变量 BACKEND_URL 注入（docker-entrypoint 用 envsubst 渲染）
-# 也可以直接改成 http://qm-server:3000（容器 network 内联）
 
 server {
     listen       80;
@@ -38,10 +42,9 @@ server {
         try_files $uri =404;
     }
 
-    # API 反代（生产环境后端走容器网络或反代域名）
-    # 默认假设后端跑在 host.docker.internal:3000；上生产改成实际地址
+    # API 反代（envsubst 渲染 ${BACKEND_URL}）
     location /api/ {
-        proxy_pass http://host.docker.internal:3000;
+        proxy_pass ${BACKEND_URL};
         proxy_http_version 1.1;
         proxy_set_header Host              $host;
         proxy_set_header X-Real-IP         $remote_addr;

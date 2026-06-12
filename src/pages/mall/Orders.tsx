@@ -4,7 +4,7 @@
  * 列表：admin/listOrders（分页 + 状态过滤）
  * 写：admin/updateOrderStatus（5 个枚举）
  */
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import {
   PageContainer,
   ProTable,
@@ -34,6 +34,8 @@ const NEXT_STATUS: Record<OrderStatus, OrderStatus[]> = {
 export default function OrdersPage() {
   const { message } = AntdApp.useApp();
   const actionRef = useRef<ActionType>();
+  // 并发锁：扭转中的 orderId 集合，避免重复提交
+  const [transitioning, setTransitioning] = useState<Record<string, boolean>>({});
 
   const columns: ProColumns<OrderListItem>[] = [
     { title: '订单号', dataIndex: 'id', width: 220, copyable: true, search: false },
@@ -103,20 +105,30 @@ export default function OrdersPage() {
       render: (_, r) => {
         const nexts = NEXT_STATUS[r.status];
         if (nexts.length === 0) return <Typography.Text type="secondary">—</Typography.Text>;
+        const loading = !!transitioning[r.id];
         return (
           <Select
-            placeholder="扭转状态"
+            placeholder={loading ? '扭转中...' : '扭转状态'}
             size="small"
             style={{ width: 160 }}
             value={undefined}
+            disabled={loading}
             options={nexts.map((s) => ({ label: STATUS_META[s].text, value: s }))}
             onChange={async (next: OrderStatus) => {
+              // 并发锁：同一订单不允许并发提交
+              if (transitioning[r.id]) return;
+              setTransitioning((s) => ({ ...s, [r.id]: true }));
               try {
                 await updateOrderStatus({ orderId: r.id, status: next });
                 message.success(`已扭转：${STATUS_META[r.status].text} → ${STATUS_META[next].text}`);
                 actionRef.current?.reload();
               } catch (e) {
                 message.error((e as Error).message);
+              } finally {
+                setTransitioning((s) => {
+                  const { [r.id]: _, ...rest } = s;
+                  return rest;
+                });
               }
             }}
           />

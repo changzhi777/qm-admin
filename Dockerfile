@@ -24,8 +24,13 @@ FROM nginx:1.27-alpine AS runner
 # 删除默认配置
 RUN rm /etc/nginx/conf.d/default.conf
 
-# 拷自定义 nginx 配置
-COPY deploy/nginx.conf /etc/nginx/conf.d/qm-admin.conf
+# 拷模板到 /etc/nginx/templates/ — nginx:1.27-alpine 入口脚本会自动 envsubst
+# 渲染所有 ${VAR}，输出到 /etc/nginx/conf.d/qm-admin.conf
+COPY deploy/qm-admin.conf.template /etc/nginx/templates/qm-admin.conf.template
+
+# 默认后端地址（开发：Mac/Win Docker Desktop 用 host.docker.internal）
+# 生产/Linux：通过 docker run -e BACKEND_URL=http://qm-server:3000 覆盖
+ENV BACKEND_URL=http://host.docker.internal:3000
 
 # 拷构建产物
 COPY --from=builder /app/dist /usr/share/nginx/html

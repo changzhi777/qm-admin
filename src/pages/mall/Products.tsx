@@ -123,23 +123,35 @@ export default function ProductsPage() {
             ? {
                 ...editTarget,
                 price: Number(editTarget.price),
-                originalPrice: editTarget.originalPrice ? Number(editTarget.originalPrice) : undefined,
+                // null / undefined → undefined（不传字段）；非空 → Number 转换
+                originalPrice:
+                  editTarget.originalPrice != null
+                    ? Number(editTarget.originalPrice)
+                    : undefined,
+                memberDiscount:
+                  editTarget.memberDiscount != null
+                    ? Number(editTarget.memberDiscount)
+                    : undefined,
                 images: (editTarget.images ?? []).join('\n'),
               }
             : { status: 'on', stock: 0, sort: 0 }
         }
         onFinish={async (values) => {
           try {
+            // 显式 null/空 检查（避免 Number(null)=0 误写后端，后端 originalPrice 是 positive optional）
+            const toOptionalNumber = (v: unknown): number | undefined => {
+              if (v == null || v === '') return undefined;
+              const n = Number(v);
+              return Number.isFinite(n) ? n : undefined;
+            };
             await upsertProduct({
               id: editTarget?.id,
               name: values.name,
               category: values.category,
               brand: values.brand || undefined,
               price: Number(values.price),
-              originalPrice: values.originalPrice ? Number(values.originalPrice) : undefined,
-              memberDiscount: values.memberDiscount
-                ? Number(values.memberDiscount)
-                : undefined,
+              originalPrice: toOptionalNumber(values.originalPrice),
+              memberDiscount: toOptionalNumber(values.memberDiscount),
               images:
                 typeof values.images === 'string'
                   ? values.images

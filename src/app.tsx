@@ -83,7 +83,8 @@ export const request: RequestConfig = {
           localStorage.removeItem('qm_admin_token');
           localStorage.removeItem('qm_admin_user');
           if (location.pathname !== '/login') {
-            location.href = '/login';
+            // 用 history.push 替代 location.href，避免整页强刷丢失表单状态
+            history.push('/login');
           }
         }
         if (data.code !== 0 && data.code !== undefined) {
