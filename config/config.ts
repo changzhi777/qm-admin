@@ -1,0 +1,79 @@
+// max 包内部就是 umi，但 paths 把 @umijs/max 映射到了运行时 exports.ts；
+// 配置时的 defineConfig 走 umi 包本体即可
+import { defineConfig } from 'umi';
+
+/**
+ * umi max 配置 — 青沐 admin
+ *
+ * Max preset 自带：antd / access / initialState / request / layout 等插件
+ * 文档：https://umijs.org/docs/max/introduce
+ */
+export default defineConfig({
+  title: '青沐 admin',
+  // antd 5
+  antd: {},
+  // 全局 layout（max 接管 layout 渲染）
+  layout: {
+    title: '青沐 admin',
+    locale: false,
+  },
+  // 全局鉴权
+  access: {},
+  // useModel 钩子（initialState 依赖）
+  model: {},
+  // 全局 initial state（登录态）
+  initialState: {},
+  // 全局 request（axios）
+  request: {},
+  // dev proxy：/api/* → Fastify server
+  proxy: {
+    '/api': {
+      target: 'http://127.0.0.1:3000',
+      changeOrigin: true,
+    },
+  },
+  // 路由
+  routes: [
+    {
+      path: '/login',
+      layout: false,
+      component: '@/pages/Login',
+    },
+    {
+      path: '/',
+      redirect: '/dashboard',
+    },
+    {
+      path: '/dashboard',
+      name: 'Dashboard',
+      icon: 'DashboardOutlined',
+      component: '@/pages/Dashboard',
+    },
+    {
+      path: '/mall',
+      name: '商城',
+      icon: 'ShopOutlined',
+      routes: [
+        {
+          path: '/mall/categories',
+          name: '商品分类',
+          icon: 'AppstoreOutlined',
+          component: '@/pages/mall/Categories',
+        },
+        {
+          path: '/mall/products',
+          name: '商品管理',
+          icon: 'ShoppingOutlined',
+          component: '@/pages/mall/Products',
+        },
+        {
+          path: '/mall/orders',
+          name: '订单管理',
+          icon: 'FileTextOutlined',
+          component: '@/pages/mall/Orders',
+        },
+      ],
+    },
+  ],
+  npmClient: 'npm',
+});

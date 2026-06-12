@@ -1,0 +1,28 @@
+{
+  "name": "qm-admin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "青沐生命科技 admin Web 后台（React + Ant Design Pro / Umi Max）",
+  "scripts": {
+    "dev": "max dev",
+    "build": "max build",
+    "preview": "max preview",
+    "setup": "max setup",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.5.1",
+    "@ant-design/pro-components": "^2.7.10",
+    "@umijs/max": "^4.4.10",
+    "antd": "^5.21.4",
+    "dayjs": "^1.11.13",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.6.3"
+  }
+}
