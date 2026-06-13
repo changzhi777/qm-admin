@@ -1,13 +1,12 @@
 /**
  * qm-admin vitest 配置
  *
- * 关注：
- * - happy-dom env（轻量 DOM 模拟，替代 jsdom 提速 30%）
- * - alias 与 tsconfig.json paths 对齐（@/* → src/*，@@/* → src/.umi/*）
- * - 排除 Umi Max 自身 .umi 生成代码（避免误入测试集）
+ * 双 environment：
+ * - happy-dom（默认）：轻量 DOM 模拟，**纯逻辑 / 包装层测试用**
+ * - jsdom（按 file 标注 .dom.test.tsx）：antd / React 组件渲染用
  *
- * 暂不引 @testing-library/react：先做高 ROI 纯逻辑 / 包装层测试
- * UI 组件测试等需要时再加（避免早期过度基建）
+ * alias 与 tsconfig.json paths 对齐（@/* → src/*，@@/* → src/.umi/*）
+ * 排除 Umi Max 自身 .umi 生成代码（避免误入测试集）
  */
 import { defineConfig } from 'vitest/config';
 import { fileURLToPath } from 'node:url';
@@ -29,8 +28,12 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'happy-dom',
+    // 默认 happy-dom（轻量），用 .dom.test.tsx 命名的组件测试走 jsdom
+    environmentMatchGlobs: [
+      ['tests/**/*.{dom,component,jsx,tsx}.test.{ts,tsx}', 'jsdom'],
+    ],
     include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx'],
     exclude: ['node_modules', 'dist', 'src/.umi', 'src/.umi-production'],
+    setupFiles: ['./tests/setup.ts'],
   },
 });
