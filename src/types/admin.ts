@@ -24,8 +24,9 @@ export interface ProductUpsertResp {
 }
 
 /** —— 订单 —— */
-
-export type OrderStatus = 'pending_pay' | 'paid' | 'shipped' | 'done' | 'cancelled';
+// 注意：后端 Prisma Order.status 实际支持 'refunded' / 'refunding'，admin 列表也可能返回
+// 这里保留前端常用 5 态，'refunded' 单独提
+export type OrderStatus = 'pending_pay' | 'paid' | 'shipped' | 'done' | 'cancelled' | 'refunded' | 'refunding';
 
 export interface OrderListReq {
   status?: OrderStatus;
@@ -71,6 +72,23 @@ export interface OrderStatusUpdateResp {
   id: string;
   status: OrderStatus;
   updatedAt: string;
+}
+
+/** Phase 4.1 退款请求（admin 调） */
+export interface OrderRefundReq {
+  orderId: string;
+  /** 退款金额（分）— 缺省 = order.payAmount 全额 */
+  amountFen?: number;
+  reason?: string;
+}
+
+export interface OrderRefundResp {
+  orderId: string;
+  refundId: string;
+  refundYuan: number;
+  /** 微信侧返回：SUCCESS / PROCESSING */
+  status: string;
+  refundedBy: string;
 }
 
 /** —— 内容 —— */

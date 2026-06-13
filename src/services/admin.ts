@@ -11,6 +11,8 @@ import type {
   OrderListResp,
   OrderStatusUpdateReq,
   OrderStatusUpdateResp,
+  OrderRefundReq,
+  OrderRefundResp,
   AdminListResp,
   ContentUpsertInput,
   ContentUpsertResp,
@@ -34,6 +36,11 @@ export function listOrders(req: OrderListReq = {}) {
 /** 更新订单状态 */
 export function updateOrderStatus(req: OrderStatusUpdateReq) {
   return adminCall<OrderStatusUpdateResp>('updateOrderStatus', req);
+}
+
+/** Phase 4.1 — 管理员发起退款（调微信 refund API + 扣减钱包） */
+export function refundOrder(req: OrderRefundReq) {
+  return adminCall<OrderRefundResp>('refundOrder', req);
 }
 
 /** 管理员白名单 */
