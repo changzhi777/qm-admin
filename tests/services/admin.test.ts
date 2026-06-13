@@ -16,6 +16,7 @@ import {
   upsertContent,
   listOrders,
   updateOrderStatus,
+  refundOrder,
   listAdmins,
 } from '@/services/admin';
 
@@ -57,6 +58,34 @@ describe('admin services 包装层', () => {
       orderId: 'o1',
       status: 'shipped',
     });
+  });
+
+  it('refundOrder 全额（不传 amountFen）→ adminCall("refundOrder", { orderId })', async () => {
+    await refundOrder({ orderId: 'o1' });
+    expect(mockAdminCall).toHaveBeenCalledWith('refundOrder', { orderId: 'o1' });
+  });
+
+  it('refundOrder 部分退款 → amountFen 透传', async () => {
+    await refundOrder({ orderId: 'o1', amountFen: 500, reason: '用户申请' });
+    expect(mockAdminCall).toHaveBeenCalledWith('refundOrder', {
+      orderId: 'o1',
+      amountFen: 500,
+      reason: '用户申请',
+    });
+  });
+
+  it('refundOrder 透传响应（断言类型 shape）', async () => {
+    mockAdminCall.mockResolvedValue({
+      orderId: 'o1',
+      refundId: 'wx-refund-001',
+      refundYuan: 5,
+      status: 'SUCCESS',
+      refundedBy: 'admin-openid-1',
+    });
+    const result = await refundOrder({ orderId: 'o1', amountFen: 500 });
+    expect(result.refundId).toBe('wx-refund-001');
+    expect(result.refundYuan).toBe(5);
+    expect(result.status).toBe('SUCCESS');
   });
 
   it('listAdmins → adminCall("listAdmins")', async () => {
