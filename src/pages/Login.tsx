@@ -14,7 +14,7 @@
 import { useState } from 'react';
 import { Card, Form, Input, Button, Alert, Typography, App as AntdApp } from 'antd';
 import { useNavigate, useModel } from '@umijs/max';
-import { getMe, listAdmins } from '@/services/auth';
+import { performLogin } from './login-flow';
 import type { InitialState } from '@/types/app';
 
 const { Title, Paragraph } = Typography;
@@ -40,30 +40,16 @@ export default function Login() {
       // 1. 先写 token（拦截器会自动加 Authorization 头）
       localStorage.setItem('qm_admin_token', token);
 
-      // 2. 验 token 有效性 + 拉真 user（取真 userId，避免 'unknown' 审计断链）
-      const meResp = await getMe();
-      if (meResp.user.openid !== openid) {
-        throw new Error(
-          `openid 不匹配：你填的是 ${openid.slice(0, 8)}..., 但 token 解出的是 ${meResp.user.openid.slice(0, 8)}...`,
-        );
+      // 2-4. 业务流走 performLogin（可单测覆盖）
+      const result = await performLogin({ token, openid });
+      if (!result.ok) {
+        throw new Error(result.reason);
       }
 
-      // 3. 验 admin 白名单（避免 admin 拒绝后才发现）
-      const adminsResp = await listAdmins();
-      if (!adminsResp.openids.includes(openid)) {
-        throw new Error('该 openid 不在 admin 白名单，请联系运营添加');
-      }
-
-      // 4. 全部通过 → 保存真实 user + 进后台
-      const user = {
-        id: meResp.user.id,
-        openid: meResp.user.openid,
-        nickname: meResp.user.nickname ?? `admin-${openid.slice(0, 6)}`,
-        avatarUrl: meResp.user.avatarUrl,
-      };
-      localStorage.setItem('qm_admin_user', JSON.stringify(user));
-      setInitialState({ token, user, isAdmin: true });
-      message.success(`欢迎，${user.nickname}`);
+      // 5. 全部通过 → 保存真实 user + 进后台
+      localStorage.setItem('qm_admin_user', JSON.stringify(result.user));
+      setInitialState({ token: result.token, user: result.user, isAdmin: true });
+      message.success(`欢迎，${result.user.nickname}`);
       navigate('/dashboard');
     } catch (e) {
       // 失败：清掉刚写的 token
