@@ -16,6 +16,10 @@ import type {
   AdminListResp,
   ContentUpsertInput,
   ContentUpsertResp,
+  GroupBuyUpsertInput,
+  GroupBuyUpsertResp,
+  GroupBuyListReq,
+  GroupBuyListResp,
 } from '@/types/admin';
 
 /** 商品 upsert（id 缺省 = create） */
@@ -46,4 +50,14 @@ export function refundOrder(req: OrderRefundReq) {
 /** 管理员白名单 */
 export function listAdmins() {
   return adminCall<AdminListResp>('listAdmins');
+}
+
+/** V0.1.38 团购 upsert（id 缺省 = create）*/
+export function upsertGroupBuy(input: GroupBuyUpsertInput) {
+  return adminCall<GroupBuyUpsertResp>('upsertGroupBuy', input);
+}
+
+/** V0.1.38 团购列表（admin，分页 + status 过滤）*/
+export function listGroupBuys(req: GroupBuyListReq = {}) {
+  return adminCall<GroupBuyListResp>('listGroupBuys', req);
 }

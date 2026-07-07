@@ -124,3 +124,44 @@ export interface ContentUpsertResp {
 export interface AdminListResp {
   openids: string[];
 }
+
+/** —— 团购（V0.1.38 admin）—— */
+
+export interface GroupBuyUpsertInput {
+  id?: string;
+  productId: string;
+  groupPrice: number;
+  targetCount: number;
+  endDate?: string; // ISO
+}
+
+export interface GroupBuyUpsertResp {
+  id: string;
+}
+
+export type GroupBuyStatus = 'active' | 'reached';
+
+export interface GroupBuyListReq {
+  status?: GroupBuyStatus;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface GroupBuyListItem {
+  id: string;
+  productId: string;
+  groupPrice: string;
+  targetCount: number;
+  currentCount: number;
+  status: GroupBuyStatus;
+  endDate: string | null;
+  createdAt: string;
+  product: { id: string; name: string; price: string };
+}
+
+export interface GroupBuyListResp {
+  list: GroupBuyListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}

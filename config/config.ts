@@ -72,6 +72,12 @@ export default defineConfig({
           icon: 'FileTextOutlined',
           component: '@/pages/mall/Orders',
         },
+        {
+          path: '/mall/group-buys',
+          name: '团购管理',
+          icon: 'ShopOutlined',
+          component: '@/pages/mall/GroupBuys',
+        },
       ],
     },
   ],
