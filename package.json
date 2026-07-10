@@ -1,6 +1,6 @@
 {
   "name": "qm-admin",
-  "version": "0.1.0",
+  "version": "0.1.100",
   "private": true,
   "description": "青沐生命科技 admin Web 后台（React + Ant Design Pro / Umi Max）",
   "scripts": {
