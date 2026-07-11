@@ -93,7 +93,7 @@ export interface OrderRefundResp {
 
 /** —— 内容 —— */
 
-export type ContentType = 'article' | 'marathon' | 'event' | 'course';
+export type ContentType = 'marathon' | 'hotel' | 'scenic' | 'food' | 'rural';
 export type ContentActionType = 'enroll' | 'book' | 'link' | 'none';
 export type ContentStatus = 'on' | 'off';
 
@@ -117,6 +117,36 @@ export interface ContentUpsertInput {
 
 export interface ContentUpsertResp {
   id: string;
+}
+
+export interface ContentListItem {
+  id: string;
+  type: ContentType;
+  title: string;
+  cover: string | null;
+  summary: string | null;
+  price: string | null;
+  fee: string | null;
+  date: string | null;
+  location: string | null;
+  tags: string[];
+  actionType: ContentActionType;
+  status: 'on' | 'off';
+  sort: number;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface ContentListReq {
+  type?: ContentType;
+  status?: 'on' | 'off';
+  page?: number;
+  pageSize?: number;
+}
+export interface ContentListResp {
+  list: ContentListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
 }
 
 /** —— admin 白名单 —— */
@@ -164,4 +194,100 @@ export interface GroupBuyListResp {
   total: number;
   page: number;
   pageSize: number;
+}
+
+/** —— 评价管理（V0.1.122 qm-admin）—— */
+export interface ReviewListItem {
+  id: string;
+  userId: string;
+  productId: string;
+  orderId: string;
+  rating: number;
+  content: string | null;
+  images: string[];
+  replyContent: string | null;
+  repliedAt: string | null;
+  createdAt: string;
+  user: { id: string; nickname: string | null; avatarUrl: string | null };
+  product: { id: string; name: string };
+}
+export interface ReviewListReq {
+  page?: number;
+  pageSize?: number;
+}
+export interface ReviewListResp {
+  list: ReviewListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+export interface ReviewReplyReq {
+  reviewId: string;
+  content: string;
+}
+
+/** —— 提现管理（V0.1.122）—— */
+export type WithdrawalStatus = 'pending' | 'approved' | 'rejected';
+export interface WithdrawalListItem {
+  id: string;
+  userId: string;
+  amount: string;
+  status: WithdrawalStatus;
+  reason: string | null;
+  processedBy: string | null;
+  processedAt: string | null;
+  createdAt: string;
+  user: { id: string; nickname: string | null };
+}
+export interface WithdrawalListReq {
+  status?: WithdrawalStatus;
+  page?: number;
+  pageSize?: number;
+}
+export interface WithdrawalListResp {
+  list: WithdrawalListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+export interface WithdrawalActionReq {
+  id: string;
+  reason?: string;
+}
+
+/** —— 用户管理（V0.1.122）—— */
+export interface UserListItem {
+  id: string;
+  openid: string;
+  nickname: string | null;
+  phone: string | null;
+  points: number;
+  isBanned: boolean;
+  bannedReason: string | null;
+  createdAt: string;
+}
+export interface UserListReq {
+  page?: number;
+  pageSize?: number;
+}
+export interface UserListResp {
+  list: UserListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+export interface UserBanReq {
+  openid: string;
+  reason?: string;
+}
+export interface UserUnbanReq {
+  openid: string;
+}
+
+/** —— 自提核销（V0.1.122）—— */
+export interface PickupConfirmReq {
+  pickupCode: string;
+}
+export interface PickupConfirmResp {
+  ok: boolean;
 }

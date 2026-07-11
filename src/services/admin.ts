@@ -16,10 +16,24 @@ import type {
   AdminListResp,
   ContentUpsertInput,
   ContentUpsertResp,
+  ContentListReq,
+  ContentListResp,
   GroupBuyUpsertInput,
   GroupBuyUpsertResp,
   GroupBuyListReq,
   GroupBuyListResp,
+  ReviewListReq,
+  ReviewListResp,
+  ReviewReplyReq,
+  WithdrawalListReq,
+  WithdrawalListResp,
+  WithdrawalActionReq,
+  UserListReq,
+  UserListResp,
+  UserBanReq,
+  UserUnbanReq,
+  PickupConfirmReq,
+  PickupConfirmResp,
 } from '@/types/admin';
 
 /** 商品 upsert（id 缺省 = create） */
@@ -30,6 +44,11 @@ export function upsertProduct(input: ProductUpsertInput) {
 /** 内容 upsert（id 缺省 = create） */
 export function upsertContent(input: ContentUpsertInput) {
   return adminCall<ContentUpsertResp>('upsertContent', input);
+}
+
+/** V0.1.122 内容列表（admin，分页 + type/status 过滤） */
+export function listContents(req: ContentListReq = {}) {
+  return adminCall<ContentListResp>('listContents', req);
 }
 
 /** 订单列表（分页 + 状态过滤） */
@@ -60,4 +79,39 @@ export function upsertGroupBuy(input: GroupBuyUpsertInput) {
 /** V0.1.38 团购列表（admin，分页 + status 过滤）*/
 export function listGroupBuys(req: GroupBuyListReq = {}) {
   return adminCall<GroupBuyListResp>('listGroupBuys', req);
+}
+
+/** V0.1.122 评价管理 */
+export function listReviews(req: ReviewListReq = {}) {
+  return adminCall<ReviewListResp>('listReviews', req);
+}
+export function addReviewReply(req: ReviewReplyReq) {
+  return adminCall<{ ok: true }>('addReviewReply', req);
+}
+
+/** V0.1.122 提现管理 */
+export function listWithdrawals(req: WithdrawalListReq = {}) {
+  return adminCall<WithdrawalListResp>('listWithdrawals', req);
+}
+export function approveWithdrawal(req: WithdrawalActionReq) {
+  return adminCall<{ ok: true }>('approveWithdrawal', req);
+}
+export function rejectWithdrawal(req: WithdrawalActionReq) {
+  return adminCall<{ ok: true }>('rejectWithdrawal', req);
+}
+
+/** V0.1.122 用户管理 */
+export function listUsers(req: UserListReq = {}) {
+  return adminCall<UserListResp>('listUsers', req);
+}
+export function banUser(req: UserBanReq) {
+  return adminCall<{ ok: true }>('banUser', req);
+}
+export function unbanUser(req: UserUnbanReq) {
+  return adminCall<{ ok: true }>('unbanUser', req);
+}
+
+/** V0.1.122 自提核销 */
+export function confirmPickup(req: PickupConfirmReq) {
+  return adminCall<PickupConfirmResp>('confirmPickup', req);
 }

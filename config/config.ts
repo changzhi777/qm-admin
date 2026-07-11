@@ -80,6 +80,36 @@ export default defineConfig({
         },
       ],
     },
+    {
+      path: '/contents',
+      name: '内容管理',
+      icon: 'ProfileOutlined',
+      component: '@/pages/Contents',
+    },
+    {
+      path: '/reviews',
+      name: '评价管理',
+      icon: 'CommentOutlined',
+      component: '@/pages/Reviews',
+    },
+    {
+      path: '/withdrawals',
+      name: '提现管理',
+      icon: 'WalletOutlined',
+      component: '@/pages/Withdrawals',
+    },
+    {
+      path: '/users',
+      name: '用户管理',
+      icon: 'TeamOutlined',
+      component: '@/pages/Users',
+    },
+    {
+      path: '/pickup',
+      name: '自提核销',
+      icon: 'CheckCircleOutlined',
+      component: '@/pages/Pickup',
+    },
   ],
   npmClient: 'npm',
 });

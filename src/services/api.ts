@@ -18,6 +18,32 @@ export async function adminCall<T = unknown>(action: string, payload?: unknown):
   });
 }
 
+/**
+ * ProTable request 适配器（V0.1.122 DRY）— adminCall + catch + {data,success,total}
+ * 用法：
+ *   request={adminTableRequest<ReviewListResp>('listReviews', message)}
+ *   request={adminTableRequest<WithdrawalListResp>('listWithdrawals', message, (p) => ({ status: p.status }))}
+ */
+export function adminTableRequest<RecordType>(
+  action: string,
+  messageApi: { error: (m: string) => void },
+  extraPayload?: (params: Record<string, unknown>) => Record<string, unknown>,
+) {
+  return async (params: Record<string, unknown>) => {
+    try {
+      const resp = await adminCall<{ list: RecordType[]; total: number }>(action, {
+        page: (params.current as number) ?? 1,
+        pageSize: (params.pageSize as number) ?? 20,
+        ...(extraPayload ? extraPayload(params) : {}),
+      });
+      return { data: resp.list, success: true, total: resp.total };
+    } catch (e) {
+      messageApi.error((e as Error).message);
+      return { data: [] as RecordType[], success: false, total: 0 };
+    }
+  };
+}
+
 /** 调 /api/mall（同样 action/payload 协议） */
 export async function mallCall<T = unknown>(action: string, payload?: unknown): Promise<T> {
   return request<T>('/mall', {
