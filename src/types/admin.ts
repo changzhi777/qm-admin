@@ -355,3 +355,11 @@ export interface AuditLogListResp {
   page: number;
   pageSize: number;
 }
+
+/** —— 统计（V0.1.124 Dashboard）—— */
+export interface StatsResp {
+  userCount: number;
+  orderCount: number;
+  paidRevenue: number;
+  checkinCount: number;
+}

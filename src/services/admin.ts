@@ -39,6 +39,7 @@ import type {
   TrainingPlanUpsertInput,
   AuditLogListReq,
   AuditLogListResp,
+  StatsResp,
 } from '@/types/admin';
 
 /** 商品 upsert（id 缺省 = create） */
@@ -132,4 +133,9 @@ export function upsertTrainingPlan(input: TrainingPlanUpsertInput) {
 /** V0.1.124 审计日志 */
 export function listAuditLogs(req: AuditLogListReq = {}) {
   return adminCall<AuditLogListResp>('listAuditLogs', req);
+}
+
+/** V0.1.124 Dashboard 统计 */
+export function stats() {
+  return adminCall<StatsResp>('stats');
 }
