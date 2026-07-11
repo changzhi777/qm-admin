@@ -34,6 +34,9 @@ import type {
   UserUnbanReq,
   PickupConfirmReq,
   PickupConfirmResp,
+  TrainingPlanListReq,
+  TrainingPlanListResp,
+  TrainingPlanUpsertInput,
 } from '@/types/admin';
 
 /** 商品 upsert（id 缺省 = create） */
@@ -114,4 +117,12 @@ export function unbanUser(req: UserUnbanReq) {
 /** V0.1.122 自提核销 */
 export function confirmPickup(req: PickupConfirmReq) {
   return adminCall<PickupConfirmResp>('confirmPickup', req);
+}
+
+/** V0.1.123 训练计划管理 */
+export function listTrainingPlans(req: TrainingPlanListReq = {}) {
+  return adminCall<TrainingPlanListResp>('listTrainingPlans', req);
+}
+export function upsertTrainingPlan(input: TrainingPlanUpsertInput) {
+  return adminCall<{ id: string }>('upsertTrainingPlan', input);
 }

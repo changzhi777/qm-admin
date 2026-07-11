@@ -291,3 +291,42 @@ export interface PickupConfirmReq {
 export interface PickupConfirmResp {
   ok: boolean;
 }
+
+/** —— 训练计划管理（V0.1.123）—— */
+export type TrainingPlanLevel = 'beginner' | 'intermediate' | 'challenge' | 'extreme';
+
+export interface TrainingPlanUpsertInput {
+  id?: string;
+  key: string;
+  name: string;
+  weeks: number;
+  level: TrainingPlanLevel;
+  goal: string;
+  desc: string;
+  weeklyMileage: string;
+  targetKm: number;
+  status?: 'active' | 'archived';
+}
+
+export interface TrainingPlanListItem {
+  id: string;
+  key: string;
+  name: string;
+  weeks: number;
+  level: TrainingPlanLevel;
+  goal: string;
+  desc: string;
+  weeklyMileage: string;
+  targetKm: number;
+  status: 'active' | 'archived';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TrainingPlanListReq {
+  status?: 'active' | 'archived';
+}
+
+export interface TrainingPlanListResp {
+  list: TrainingPlanListItem[];
+}

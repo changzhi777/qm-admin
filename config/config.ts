@@ -81,6 +81,12 @@ export default defineConfig({
       ],
     },
     {
+      path: '/training-plans',
+      name: '训练计划',
+      icon: 'TrophyOutlined',
+      component: '@/pages/TrainingPlans',
+    },
+    {
       path: '/contents',
       name: '内容管理',
       icon: 'ProfileOutlined',
