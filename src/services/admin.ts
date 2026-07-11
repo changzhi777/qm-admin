@@ -37,6 +37,8 @@ import type {
   TrainingPlanListReq,
   TrainingPlanListResp,
   TrainingPlanUpsertInput,
+  AuditLogListReq,
+  AuditLogListResp,
 } from '@/types/admin';
 
 /** 商品 upsert（id 缺省 = create） */
@@ -125,4 +127,9 @@ export function listTrainingPlans(req: TrainingPlanListReq = {}) {
 }
 export function upsertTrainingPlan(input: TrainingPlanUpsertInput) {
   return adminCall<{ id: string }>('upsertTrainingPlan', input);
+}
+
+/** V0.1.124 审计日志 */
+export function listAuditLogs(req: AuditLogListReq = {}) {
+  return adminCall<AuditLogListResp>('listAuditLogs', req);
 }

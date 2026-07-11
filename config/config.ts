@@ -81,6 +81,12 @@ export default defineConfig({
       ],
     },
     {
+      path: '/audit-logs',
+      name: '审计日志',
+      icon: 'FileSearchOutlined',
+      component: '@/pages/AuditLogs',
+    },
+    {
       path: '/training-plans',
       name: '训练计划',
       icon: 'TrophyOutlined',

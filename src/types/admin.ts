@@ -330,3 +330,28 @@ export interface TrainingPlanListReq {
 export interface TrainingPlanListResp {
   list: TrainingPlanListItem[];
 }
+
+/** —— 审计日志（V0.1.124）—— */
+export interface AuditLogListItem {
+  id: string;
+  actorOpenid: string;
+  action: string;
+  target: string;
+  payload: unknown;
+  ip: string;
+  createdAt: string;
+}
+export interface AuditLogListReq {
+  action?: string;
+  actorOpenid?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  pageSize?: number;
+}
+export interface AuditLogListResp {
+  list: AuditLogListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
