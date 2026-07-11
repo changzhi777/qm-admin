@@ -20,7 +20,7 @@ import {
   App as AntdApp,
 } from 'antd';
 import { banUser, unbanUser } from '@/services/admin';
-import { adminTableRequest } from '@/services/api';
+import { adminTableRequest, downloadAdminCsv } from '@/services/api';
 import type { UserListItem, UserListResp } from '@/types/admin';
 
 export default function UsersPage() {
@@ -141,6 +141,21 @@ export default function UsersPage() {
         actionRef={actionRef}
         columns={columns}
         search={false}
+        toolBarRender={() => [
+          <Button
+            key="export"
+            onClick={async () => {
+              try {
+                await downloadAdminCsv('exportUsers', {}, `users-${Date.now()}.csv`);
+                message.success('导出成功');
+              } catch (e) {
+                message.error((e as Error).message);
+              }
+            }}
+          >
+            导出 CSV
+          </Button>,
+        ]}
         request={adminTableRequest<UserListItem>('listUsers', message)}
       />
       <Modal

@@ -52,6 +52,34 @@ export async function mallCall<T = unknown>(action: string, payload?: unknown): 
   });
 }
 
+/**
+ * CSV 导出（V0.1.124）— exportOrders/exportUsers/exportSettlement 返 raw CSV（非 envelope）
+ * 直接 fetch + Blob 下载，绕过 request 拦截器
+ */
+export async function downloadAdminCsv(
+  action: string,
+  payload: Record<string, unknown>,
+  filename: string,
+): Promise<void> {
+  const token = localStorage.getItem('admin_token') ?? '';
+  const resp = await fetch('/api/admin', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ action, payload }),
+  });
+  if (!resp.ok) throw new Error(`导出失败: ${resp.status}`);
+  const blob = await resp.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 /** 调 /api/user（登录用） */
 export async function userCall<T = unknown>(action: string, payload?: unknown): Promise<T> {
   return request<T>('/user', {

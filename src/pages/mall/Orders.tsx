@@ -29,6 +29,7 @@ import {
   App as AntdApp,
 } from 'antd';
 import { listOrders, updateOrderStatus, refundOrder } from '@/services/admin';
+import { downloadAdminCsv } from '@/services/api';
 import type { OrderListItem, OrderStatus } from '@/types/admin';
 
 const STATUS_META: Record<OrderStatus, { text: string; color: string }> = {
@@ -232,6 +233,21 @@ export default function OrdersPage() {
         rowKey="id"
         actionRef={actionRef}
         columns={columns}
+        toolBarRender={() => [
+          <Button
+            key="export"
+            onClick={async () => {
+              try {
+                await downloadAdminCsv('exportOrders', {}, `orders-${Date.now()}.csv`);
+                message.success('导出成功');
+              } catch (e) {
+                message.error((e as Error).message);
+              }
+            }}
+          >
+            导出 CSV
+          </Button>,
+        ]}
         request={async (params) => {
           try {
             const resp = await listOrders({
