@@ -1,27 +1,22 @@
 /**
- * Login 页
+ * Login 页（V0.1.130 账号密码登录，替代手工填 token）
  *
- * 鉴权方案（临时）：
- * 1. Web admin 没法跑 wx.login，临时让用户手工粘贴 JWT token + openid
- * 2. token 来源：用微信开发者工具登录小程序，从 Network 抠 accessToken
- * 3. **真校验**（区别于 V0.1 占位实现）：
- *    a. 写入 token → 后端 me 验证 token 有效性 + 取真实 userId/nickname/avatar
- *    b. listAdmins 验证 openid 在 admin_whitelist 里
- *    c. 任一失败 → 清 token + 提示
+ * 流程：username + password → /api/auth/login method=password → 拿 token + user
+ *      → listAdmins 验 openid 在白名单 → 进后台
  *
- * 后期：扫码登录（小程序扫 admin 二维码 → 后端验 admin → 签 JWT 给 admin）
+ * admin User 需先在小程序「账号绑定」页绑 username + 密码（bindApps）
  */
 import { useState } from 'react';
 import { Card, Form, Input, Button, Alert, Typography, App as AntdApp } from 'antd';
 import { useNavigate, useModel } from '@umijs/max';
-import { performLogin } from './login-flow';
+import { performPasswordLogin } from './login-flow';
 import type { InitialState } from '@/types/app';
 
 const { Title, Paragraph } = Typography;
 
 interface LoginForm {
-  token: string;
-  openid: string;
+  username: string;
+  password: string;
 }
 
 export default function Login() {
@@ -34,25 +29,16 @@ export default function Login() {
 
   const onFinish = async (values: LoginForm) => {
     setLoading(true);
-    const token = values.token.trim();
-    const openid = values.openid.trim();
     try {
-      // 1. 先写 token（拦截器会自动加 Authorization 头）
-      localStorage.setItem('qm_admin_token', token);
+      const result = await performPasswordLogin(values);
+      if (!result.ok) throw new Error(result.reason);
 
-      // 2-4. 业务流走 performLogin（可单测覆盖）
-      const result = await performLogin({ token, openid });
-      if (!result.ok) {
-        throw new Error(result.reason);
-      }
-
-      // 5. 全部通过 → 保存真实 user + 进后台
+      localStorage.setItem('qm_admin_token', result.token);
       localStorage.setItem('qm_admin_user', JSON.stringify(result.user));
       setInitialState({ token: result.token, user: result.user, isAdmin: true });
       message.success(`欢迎，${result.user.nickname}`);
       navigate('/dashboard');
     } catch (e) {
-      // 失败：清掉刚写的 token
       localStorage.removeItem('qm_admin_token');
       message.error('登录失败：' + (e as Error).message);
     } finally {
@@ -70,7 +56,7 @@ export default function Login() {
         background: 'linear-gradient(135deg, #0FAF8E 0%, #0a8c70 100%)',
       }}
     >
-      <Card style={{ width: 480, borderRadius: 8 }}>
+      <Card style={{ width: 420, borderRadius: 8 }}>
         <Title level={3} style={{ textAlign: 'center', color: '#0FAF8E' }}>
           青沐 admin
         </Title>
@@ -78,25 +64,19 @@ export default function Login() {
           type="info"
           showIcon
           style={{ marginBottom: 16 }}
-          message="临时登录方式（V0.2 加固版）"
+          message="账号密码登录"
           description={
             <Paragraph style={{ marginBottom: 0, fontSize: 12 }}>
-              手工粘贴小程序登录后的 accessToken + 你的 openid。
-              登录时会调 <code>me</code> 验 token 有效性 + 调
-              <code> listAdmins</code> 验白名单。
+              运营 admin 账号登录。账号需先在小程序「账号绑定」页设置 username + 密码。
             </Paragraph>
           }
         />
         <Form<LoginForm> layout="vertical" onFinish={onFinish}>
-          <Form.Item
-            label="JWT accessToken"
-            name="token"
-            rules={[{ required: true, message: '必填' }]}
-          >
-            <Input.TextArea rows={3} placeholder="eyJhbGciOi..." />
+          <Form.Item label="账号" name="username" rules={[{ required: true, message: '必填' }]}>
+            <Input placeholder="admin 用户名" autoComplete="username" />
           </Form.Item>
-          <Form.Item label="openid" name="openid" rules={[{ required: true, message: '必填' }]}>
-            <Input placeholder="oXXXXXXXXXXXXXXXXXX" />
+          <Form.Item label="密码" name="password" rules={[{ required: true, message: '必填' }]}>
+            <Input.Password placeholder="密码" autoComplete="current-password" />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={loading} block>

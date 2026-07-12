@@ -1,7 +1,7 @@
 /**
  * user / auth 接口 wrapper
  */
-import { userCall, adminCall } from './api';
+import { userCall, adminCall, authCall } from './api';
 import type { AdminUser } from '@/types/app';
 import type { AdminListResp } from '@/types/admin';
 
@@ -18,4 +18,19 @@ export function getMe() {
 /** 查 admin 白名单（用于客户端二次校验，避免无效操作请求） */
 export function listAdmins() {
   return adminCall<AdminListResp>('listAdmins');
+}
+
+/** V0.1.130 账号密码登录（调 /api/auth/login method=password，返 token + user） */
+export interface PasswordLoginResp {
+  user: AdminUser;
+  accessToken: string;
+  refreshToken: string;
+  config?: unknown;
+}
+
+export function loginByPassword(username: string, password: string) {
+  return authCall<PasswordLoginResp>('login', {
+    method: 'password',
+    payload: { username, password },
+  });
 }

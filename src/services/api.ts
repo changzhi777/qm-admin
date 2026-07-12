@@ -87,3 +87,14 @@ export async function userCall<T = unknown>(action: string, payload?: unknown): 
     data: { action, payload: payload ?? {} },
   });
 }
+
+/**
+ * 调 /api/auth/{action}（独立 route，V0.1.129 多方式认证）
+ * 拦截器解包 envelope（{code,data}→data）+ 401 跳 /login
+ */
+export async function authCall<T = unknown>(action: string, payload?: unknown): Promise<T> {
+  return request<T>(`/auth/${action}`, {
+    method: 'POST',
+    data: { action, payload: payload ?? {} },
+  });
+}

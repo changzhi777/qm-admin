@@ -8,7 +8,7 @@
  * 3. listAdmins 白名单校验
  * 4. 任意失败 → 抛错，由调用方处理（清 localStorage / 提示）
  */
-import { getMe, listAdmins } from '@/services/auth';
+import { getMe, listAdmins, loginByPassword } from '@/services/auth';
 import type { InitialState } from '@/types/app';
 
 export interface LoginInput {
@@ -71,5 +71,54 @@ export async function performLogin(input: LoginInput): Promise<LoginResult> {
     },
     isAdmin: true,
     token,
+  };
+}
+
+/**
+ * 账号密码登录流程（V0.1.130，替代手工填 token）
+ *
+ * 1. 调 /api/auth/login {method:'password'} → 拿 token + user
+ * 2. listAdmins 验 openid 在白名单
+ * 3. 失败 → { ok: false, reason }（不抛错，便于 UI 断言）
+ *
+ * admin User 需先在小程序 bind-apps 页绑 username + password
+ */
+export async function performPasswordLogin(input: {
+  username: string;
+  password: string;
+}): Promise<LoginResult> {
+  const username = input.username.trim();
+  const password = input.password;
+  if (!username || !password) {
+    return { ok: false, reason: '账号 / 密码不能为空' };
+  }
+
+  let resp: Awaited<ReturnType<typeof loginByPassword>>;
+  try {
+    resp = await loginByPassword(username, password);
+  } catch (e) {
+    return { ok: false, reason: (e as Error).message || '账号或密码错误' };
+  }
+
+  // 写 token（拦截器加 Authorization）
+  localStorage.setItem('qm_admin_token', resp.accessToken);
+
+  // 验 admin 白名单（openid）
+  const adminsResp = await listAdmins();
+  if (!adminsResp.openids.includes(resp.user.openid)) {
+    localStorage.removeItem('qm_admin_token');
+    return { ok: false, reason: '该账号不在 admin 白名单，请联系运营' };
+  }
+
+  return {
+    ok: true,
+    user: {
+      id: resp.user.id,
+      openid: resp.user.openid,
+      nickname: resp.user.nickname ?? `admin-${resp.user.openid.slice(0, 6)}`,
+      avatarUrl: resp.user.avatarUrl,
+    },
+    isAdmin: true,
+    token: resp.accessToken,
   };
 }
