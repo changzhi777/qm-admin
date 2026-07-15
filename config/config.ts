@@ -122,6 +122,30 @@ export default defineConfig({
       icon: 'CheckCircleOutlined',
       component: '@/pages/Pickup',
     },
+    {
+      path: '/invite',
+      name: '邀请裂变',
+      icon: 'UserAddOutlined',
+      component: '@/pages/Invite',
+    },
+    {
+      path: '/uploads',
+      name: '上传管理',
+      icon: 'CloudUploadOutlined',
+      component: '@/pages/Uploads',
+    },
+    {
+      path: '/config',
+      name: '配置管理',
+      icon: 'SettingOutlined',
+      component: '@/pages/Config',
+    },
+    {
+      path: '/race',
+      name: '赛事成绩',
+      icon: 'TrophyOutlined',
+      component: '@/pages/Race',
+    },
   ],
   npmClient: 'npm',
 });

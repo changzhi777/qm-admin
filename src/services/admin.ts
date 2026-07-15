@@ -40,6 +40,19 @@ import type {
   AuditLogListReq,
   AuditLogListResp,
   StatsResp,
+  AdjustPointsReq,
+  AdjustPointsResp,
+  GrantMemberReq,
+  GrantMemberResp,
+  InviteStatsReq,
+  InviteStatsResp,
+  UploadListReq,
+  UploadListResp,
+  SetConfigReq,
+  RaceResultReq,
+  EnrollmentsResp,
+  StatsByTimeRangeReq,
+  StatsByTimeRangeResp,
 } from '@/types/admin';
 
 /** 商品 upsert（id 缺省 = create） */
@@ -138,4 +151,41 @@ export function listAuditLogs(req: AuditLogListReq = {}) {
 /** V0.1.124 Dashboard 统计 */
 export function stats() {
   return adminCall<StatsResp>('stats');
+}
+
+/** V0.2.6 邀请裂变管理 */
+export function adjustPoints(req: AdjustPointsReq) {
+  return adminCall<AdjustPointsResp>('adjustPoints', req);
+}
+export function grantMember(req: GrantMemberReq) {
+  return adminCall<GrantMemberResp>('grantMember', req);
+}
+export function listInviteStats(req: InviteStatsReq = {}) {
+  return adminCall<InviteStatsResp>('listInviteStats', req);
+}
+
+/** V0.1.150 上传管理 */
+export function listUploads(req: UploadListReq = {}) {
+  return adminCall<UploadListResp>('listUploads', req);
+}
+export function retryParse(req: { id: string }) {
+  return adminCall<{ ok: true }>('retryParse', req);
+}
+
+/** 配置管理（功能开关/会员等级/Categories 写入）*/
+export function setConfig(req: SetConfigReq) {
+  return adminCall<{ ok: true }>('setConfig', req);
+}
+
+/** V0.1.134 赛事成绩 */
+export function submitRaceResult(req: RaceResultReq) {
+  return adminCall<{ id: string }>('submitRaceResult', req);
+}
+export function listEnrollmentsByContent(contentId: string) {
+  return adminCall<EnrollmentsResp>('listEnrollmentsByContent', { contentId });
+}
+
+/** 时段统计（Dashboard 增强）*/
+export function statsByTimeRange(req: StatsByTimeRangeReq = {}) {
+  return adminCall<StatsByTimeRangeResp>('statsByTimeRange', req);
 }

@@ -363,3 +363,110 @@ export interface StatsResp {
   paidRevenue: number;
   checkinCount: number;
 }
+
+/** —— V0.2.6 邀请裂变管理 —— */
+export interface AdjustPointsReq {
+  userId: string;
+  change: number; // ± 正加负扣
+  reason?: string;
+}
+export interface AdjustPointsResp {
+  ok: boolean;
+  userId: string;
+  points: number;
+}
+export interface GrantMemberReq {
+  userId: string;
+  days: number;
+}
+export interface GrantMemberResp {
+  ok: boolean;
+  userId: string;
+  memberExpireAt: string | null;
+}
+export interface InviteStatsReq {
+  page?: number;
+  pageSize?: number;
+}
+export interface InviteStatsItem {
+  id: string;
+  nickname: string | null;
+  avatarUrl: string | null;
+  inviteCode: string | null;
+  distributorLevel: string;
+  inviteCount: number;
+}
+export interface InviteStatsResp {
+  list: InviteStatsItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+/** —— V0.1.150 上传管理 —— */
+export type UploadStatus = 'pending' | 'parsing' | 'parsed' | 'failed';
+export interface UploadListItem {
+  id: string;
+  userId: string;
+  type: string;
+  cosUrl: string;
+  status: UploadStatus;
+  mime: string | null;
+  size: number;
+  errorMsg: string | null;
+  createdAt: string;
+  user: { id: string; nickname: string | null; phone: string | null };
+}
+export interface UploadListReq {
+  status?: UploadStatus;
+  page?: number;
+  pageSize?: number;
+}
+export interface UploadListResp {
+  list: UploadListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+/** —— 配置管理（setConfig）—— */
+export interface SetConfigReq {
+  id: string;
+  value: unknown;
+}
+
+/** —— V0.1.134 赛事成绩 —— */
+export interface RaceResultReq {
+  enrollmentId: string;
+  finishTimeSec: number;
+  rank?: number;
+  bibNumber?: string;
+}
+export interface EnrollmentListItem {
+  id: string;
+  userId: string;
+  contentId: string;
+  status: string;
+  createdAt: string;
+  user: { id: string; nickname: string | null; phone: string | null };
+  raceResult: { id: string; finishTimeSec: number; rank: number | null; bibNumber: string | null } | null;
+}
+export interface EnrollmentsResp {
+  list: EnrollmentListItem[];
+}
+
+/** —— 时段统计（Dashboard 增强）—— */
+export interface StatsByTimeRangeReq {
+  startDate?: string;
+  endDate?: string;
+  granularity?: 'day' | 'week' | 'month';
+}
+export interface StatsByTimeRangeItem {
+  bucket: string;
+  revenue: string;
+  orderCount: number;
+  userCount: number;
+}
+export interface StatsByTimeRangeResp {
+  list: StatsByTimeRangeItem[];
+}

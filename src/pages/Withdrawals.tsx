@@ -21,7 +21,7 @@ import {
   approveWithdrawal,
   rejectWithdrawal,
 } from '@/services/admin';
-import { adminTableRequest } from '@/services/api';
+import { adminTableRequest, downloadAdminCsv } from '@/services/api';
 import type {
   WithdrawalListItem,
   WithdrawalStatus,
@@ -130,7 +130,32 @@ export default function WithdrawalsPage() {
   ];
 
   return (
-    <PageContainer header={{ title: '提现管理' }}>
+    <PageContainer
+      header={{
+        title: '提现管理',
+        extra: (
+          <Space>
+            <Button
+              onClick={async () => {
+                try {
+                  const ym = new Date().toISOString().slice(0, 7);
+                  await downloadAdminCsv(
+                    'exportSettlement',
+                    { yearMonth: ym },
+                    `settlement-${ym}.csv`,
+                  );
+                  message.success('结算单导出成功');
+                } catch (e) {
+                  message.error((e as Error).message);
+                }
+              }}
+            >
+              导出本月结算单
+            </Button>
+          </Space>
+        ),
+      }}
+    >
       <ProTable<WithdrawalListItem>
         rowKey="id"
         actionRef={actionRef}
