@@ -146,6 +146,12 @@ export default defineConfig({
       icon: 'TrophyOutlined',
       component: '@/pages/Race',
     },
+    {
+      path: '/admins',
+      name: '管理员账号',
+      icon: 'SafetyOutlined',
+      component: '@/pages/Admins',
+    },
   ],
   npmClient: 'npm',
 });

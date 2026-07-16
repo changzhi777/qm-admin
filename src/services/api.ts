@@ -18,6 +18,14 @@ export async function adminCall<T = unknown>(action: string, payload?: unknown):
   });
 }
 
+/** V0.2.8 admin 专属登录（POST /api/admin/login，替 auth.login password）*/
+export async function adminLoginCall(username: string, password: string) {
+  return request<{
+    accessToken: string;
+    admin: { id: string; username: string; role: string; nickname: string | null };
+  }>('/admin/login', { method: 'POST', data: { username, password } });
+}
+
 /**
  * ProTable request 适配器（V0.1.122 DRY）— adminCall + catch + {data,success,total}
  * 用法：

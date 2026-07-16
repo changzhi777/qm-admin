@@ -103,20 +103,14 @@ export async function performPasswordLogin(input: {
   // 写 token（拦截器加 Authorization）
   localStorage.setItem('qm_admin_token', resp.accessToken);
 
-  // 验 admin 白名单（openid）
-  const adminsResp = await listAdmins();
-  if (!adminsResp.openids.includes(resp.user.openid)) {
-    localStorage.removeItem('qm_admin_token');
-    return { ok: false, reason: '该账号不在 admin 白名单，请联系运营' };
-  }
-
+  // V0.2.8 admin JWT 已由后端 adminAuth 验证（替白名单 openid），不需二次校验
   return {
     ok: true,
     user: {
-      id: resp.user.id,
-      openid: resp.user.openid,
-      nickname: resp.user.nickname ?? `admin-${resp.user.openid.slice(0, 6)}`,
-      avatarUrl: resp.user.avatarUrl,
+      id: resp.admin.id,
+      openid: `admin:${resp.admin.username}`,
+      nickname: resp.admin.nickname ?? resp.admin.username,
+      avatarUrl: null,
     },
     isAdmin: true,
     token: resp.accessToken,

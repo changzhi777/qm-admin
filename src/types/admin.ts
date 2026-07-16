@@ -470,3 +470,14 @@ export interface StatsByTimeRangeItem {
 export interface StatsByTimeRangeResp {
   list: StatsByTimeRangeItem[];
 }
+
+/** V0.2.8 管理员账号（listAdmins 返）*/
+export interface AdminListItem {
+  id: string;
+  username: string;
+  role: string;
+  nickname: string | null;
+  lastLoginAt: string | null;
+  disabled: boolean;
+  createdAt: string;
+}

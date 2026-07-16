@@ -1,7 +1,7 @@
 /**
  * user / auth 接口 wrapper
  */
-import { userCall, adminCall, authCall } from './api';
+import { userCall, adminCall, authCall, adminLoginCall } from './api';
 import type { AdminUser } from '@/types/app';
 import type { AdminListResp } from '@/types/admin';
 
@@ -29,8 +29,6 @@ export interface PasswordLoginResp {
 }
 
 export function loginByPassword(username: string, password: string) {
-  return authCall<PasswordLoginResp>('login', {
-    method: 'password',
-    payload: { username, password },
-  });
+  // V0.2.8 改调 admin 专属登录（/api/admin/login，替 auth.login password）
+  return adminLoginCall(username, password);
 }
