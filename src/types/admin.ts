@@ -417,6 +417,20 @@ export interface UploadListItem {
   createdAt: string;
   user: { id: string; nickname: string | null; phone: string | null };
 }
+
+// V0.2.37 interpret 解读记录（minimax M3 资料解读）
+export interface InterpretListItem {
+  id: string;
+  userId: string;
+  nickname: string | null;
+  type: string; // garmin_fit | garmin_zip | medical | screenshot
+  inputKey: string;
+  result: string;
+  model: string;
+  inputTokens: number | null;
+  outputTokens: number | null;
+  createdAt: string;
+}
 export interface UploadListReq {
   status?: UploadStatus;
   page?: number;

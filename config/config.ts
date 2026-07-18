@@ -135,6 +135,12 @@ export default defineConfig({
       component: '@/pages/Uploads',
     },
     {
+      path: '/interpret',
+      name: '解读管理',
+      icon: 'FileSearchOutlined',
+      component: '@/pages/Interpret',
+    },
+    {
       path: '/config',
       name: '配置管理',
       icon: 'SettingOutlined',
