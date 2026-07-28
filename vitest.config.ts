@@ -35,5 +35,20 @@ export default defineConfig({
     include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx'],
     exclude: ['node_modules', 'dist', 'src/.umi', 'src/.umi-production'],
     setupFiles: ['./tests/setup.ts'],
+    // V0.3.29 GAP-G 实测 baseline：funcs 88.11% / branch 91.78%（npm run test:coverage）
+    // threshold 设保守值（比 baseline 低 2-3pp）防退化
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'clover', 'json'],
+      // 阈值（V0.3.29 baseline - 2pp 缓冲）
+      thresholds: {
+        statements: 16, // baseline 18.77
+        branches: 88, // baseline 91.78
+        functions: 86, // baseline 88.11（与主仓 QM-WX 一致）
+        lines: 16, // baseline 18.77
+      },
+      // 排除 .umi 运行时 + 类型文件
+      exclude: ['node_modules', 'dist', 'src/.umi', 'src/.umi-production', '**/*.d.ts'],
+    },
   },
 });

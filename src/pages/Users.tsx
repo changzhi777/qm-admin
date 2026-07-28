@@ -21,7 +21,7 @@ import {
 } from 'antd';
 import { banUser, unbanUser } from '@/services/admin';
 import { adminTableRequest, downloadAdminCsv } from '@/services/api';
-import type { UserListItem, UserListResp } from '@/types/admin';
+import type { UserListItem } from '@/types/admin';
 
 export default function UsersPage() {
   const { message } = AntdApp.useApp();

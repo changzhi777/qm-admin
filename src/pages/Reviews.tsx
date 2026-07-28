@@ -20,7 +20,7 @@ import {
 } from 'antd';
 import { addReviewReply } from '@/services/admin';
 import { adminTableRequest } from '@/services/api';
-import type { ReviewListItem, ReviewListResp } from '@/types/admin';
+import type { ReviewListItem } from '@/types/admin';
 
 export default function ReviewsPage() {
   const { message } = AntdApp.useApp();

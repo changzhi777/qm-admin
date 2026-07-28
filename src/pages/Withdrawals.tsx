@@ -25,7 +25,6 @@ import { adminTableRequest, downloadAdminCsv } from '@/services/api';
 import type {
   WithdrawalListItem,
   WithdrawalStatus,
-  WithdrawalListResp,
 } from '@/types/admin';
 
 const STATUS_META: Record<WithdrawalStatus, { text: string; color: string }> = {

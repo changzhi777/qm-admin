@@ -10,7 +10,7 @@
  * 注：antd AutoComplete 内部 input 没 placeholder 属性（占位符在 .ant-select-selection-placeholder span）
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 
 const mockGlobalSearch = vi.fn();
 vi.mock('@/services/admin', () => ({

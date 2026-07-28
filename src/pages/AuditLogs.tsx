@@ -4,7 +4,6 @@
  */
 import { Tag, Typography, App as AntdApp } from 'antd';
 import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components';
-import { listAuditLogs } from '@/services/admin';
 import { adminTableRequest } from '@/services/api';
 import type { AuditLogListItem } from '@/types/admin';
 

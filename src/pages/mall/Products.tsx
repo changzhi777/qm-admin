@@ -16,7 +16,7 @@ import {
   type ActionType,
   type ProColumns,
 } from '@ant-design/pro-components';
-import { Button, Tag, Image, Space, App as AntdApp } from 'antd';
+import { Button, Image, App as AntdApp } from 'antd';
 import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { listProducts, listCategories } from '@/services/mall';
 import { upsertProduct } from '@/services/admin';

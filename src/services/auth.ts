@@ -1,7 +1,7 @@
 /**
  * user / auth 接口 wrapper
  */
-import { userCall, adminCall, authCall, adminLoginCall } from './api';
+import { userCall, adminCall, adminLoginCall } from './api';
 import type { AdminUser } from '@/types/app';
 import type { AdminListResp } from '@/types/admin';
 

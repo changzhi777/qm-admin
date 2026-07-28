@@ -20,7 +20,7 @@ import {
   Space,
   App as AntdApp,
 } from 'antd';
-import { listContents, upsertContent } from '@/services/admin';
+import { upsertContent } from '@/services/admin';
 import { adminTableRequest } from '@/services/api';
 import type {
   ContentListItem,

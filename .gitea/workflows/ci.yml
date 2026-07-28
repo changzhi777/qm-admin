@@ -1,10 +1,11 @@
 # qm-admin CI — Gitea Actions（语法兼容 GitHub Actions）
 #
 # 触发：push 到 main、PR 到 main、手动
-# 阶段：
-#   1. lint-typecheck：装依赖 + max setup + tsc --noEmit
-#   2. build：max build 生成 dist/
-#   3. docker-image：构建镜像，可选 push 到 Gitea Container Registry
+# 阶段（V0.3.29 GAP-F 加 test job）：
+#   1. lint-typecheck：装依赖 + max setup + tsc --noEmit + npm run lint
+#   2. test：vitest run + coverage（threshold 门禁 funcs 86%）
+#   3. build：max build 生成 dist/
+#   4. docker-image：构建镜像，可选 push 到 Gitea Container Registry
 #
 # 启用前置：
 # - Gitea 全局 [actions] ENABLED=true（修 /etc/gitea/app.ini 后重启）
@@ -35,8 +36,10 @@ jobs:
           node-version: "20"
           cache: npm
 
+      # V0.3.29 fix：加 --legacy-peer-deps fallback 避免 Docker/Gitea Runner 上 npm 版本差异
+      # 导致 lockfile 与 package.json 不严格同步（f241715）
       - name: Install
-        run: npm ci --prefer-offline --no-audit --no-fund
+        run: npm ci --prefer-offline --no-audit --no-fund --legacy-peer-deps || npm install --prefer-offline --no-audit --no-fund --legacy-peer-deps
 
       - name: Umi setup（生成 .umi/exports.ts）
         run: npx max setup
@@ -44,16 +47,50 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-  build:
+      - name: ESLint
+        run: npm run lint
+
+  test:
     runs-on: ubuntu-latest
     needs: lint-typecheck
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install
+        run: npm ci --prefer-offline --no-audit --no-fund --legacy-peer-deps || npm install --prefer-offline --no-audit --no-fund --legacy-peer-deps
+
+      - name: Umi setup
+        run: npx max setup
+
+      # V0.3.29 GAP-F：跑 vitest + coverage（threshold 门禁 funcs 86%）
+      - name: Vitest（unit + coverage threshold）
+        run: npm run test:coverage
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qm-admin-coverage
+          path: coverage/
+          retention-days: 14
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: npm
-      - run: npm ci --prefer-offline --no-audit --no-fund
+      - run: npm ci --prefer-offline --no-audit --no-fund --legacy-peer-deps || npm install --prefer-offline --no-audit --no-fund --legacy-peer-deps
       - run: npx max setup
       - name: Build
         run: npm run build
