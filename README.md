@@ -1,17 +1,22 @@
 # qm-admin — 青沐 admin Web 后台
 
-> 青沐生命科技 · 大健康生活方式平台 管理后台
+> 青沐生命科技 · 大健康生活方式平台 管理后台（**V0.3.29**，2026-07-28 整理收官）
 >
-> 配套后端：[QM-WX/apps/server](https://github.com/your-org/QM-WX/tree/main/apps/server)（Fastify + TS）
+> 配套后端：[QM-WX/apps/server](https://github.com/changzhi777/QM-WX/tree/main/apps/server)（Fastify + TS / V0.3.29 / 66 表 / 36 module / 44 admin action）
+>
+> AI 上下文：见 [CLAUDE.md](./CLAUDE.md)（项目级 AI 上下文 + 19 page 路由 + 44 action 对齐矩阵 + GAP 状态）
+>
+> 机器可读索引：见 [`.claude/index.json`](./.claude/index.json)
 
 ## 技术栈
 
 - **框架**：[Umi Max](https://umijs.org/docs/max/introduce) 4 + React 18
 - **UI**：Ant Design 5 + Ant Design ProComponents 2.7
-- **状态**：Umi `initialState` + `useModel`（必要时引 zustand）
+- **状态**：Umi `initialState` + `useModel`（**已删 zustand**，fa1529a）
 - **请求**：Umi `request`（axios）+ Bearer JWT 拦截器
 - **构建**：Umi 4 内置（esbuild + webpack5 + MFSU）
 - **TS**：5.6 严格模式
+- **测试**：Vitest 3.2.6 + happy-dom + RTL + jsdom（**78 测 / 6 文件**）
 
 ## 快速上手
 
@@ -33,6 +38,32 @@ npm run dev
 需要后端：`cd ../QM-WX/apps/server && pnpm dev`（默认 3000 端口）。
 dev proxy 已在 `config/config.ts` 配 `/api → http://127.0.0.1:3000`。
 
+## 19 管理页路由（V0.3.29）
+
+| 路由 | 页面 | 业务 | 后端 action |
+|---|---|---|---|
+| `/login` | Login.tsx | 账号密码登录 | adminLogin |
+| `/dashboard` | Dashboard.tsx | V0.3.4 MIS 9 字段 + 7 天趋势 | dashboard + statsByTimeRange |
+| `/mall/categories` | Categories.tsx | 商品分类 CRUD | upsertContent |
+| `/mall/products` | Products.tsx | 商品 CRUD | upsertProduct |
+| `/mall/orders` | Orders.tsx | 订单 + 状态机 + 退款 + CSV | listOrders/updateOrderStatus/refundOrder/exportOrders |
+| `/mall/group-buys` | GroupBuys.tsx | 团购 CRUD | upsertGroupBuy + listGroupBuys |
+| `/contents` | Contents.tsx | 内容 CRUD | upsertContent + listContents |
+| `/training-plans` | TrainingPlans.tsx | 训练计划 CRUD | upsertTrainingPlan + listTrainingPlans |
+| `/reviews` | Reviews.tsx | 评价管理 + 回复 | listReviews + addReviewReply |
+| `/withdrawals` | Withdrawals.tsx | 提现审核 + 结算单 CSV | listWithdrawals/approveWithdrawal/rejectWithdrawal/exportSettlement |
+| `/users` | Users.tsx | 用户管理 + 封禁 + CSV | listUsers/banUser/unbanUser/exportUsers |
+| `/pickup` | Pickup.tsx | 自提核销 | confirmPickup |
+| `/invite` | Invite.tsx | 邀请裂变（V0.2.6） | adjustPoints/grantMember/listInviteStats |
+| `/uploads` | Uploads.tsx | 上传管理（V0.1.150） | listUploads + retryParse |
+| `/interpret` | Interpret.tsx | AI 资料解读（V0.2.37） | listInterpret |
+| `/audit-logs` | AuditLogs.tsx | 审计日志查询 | listAuditLogs |
+| `/config` | Config.tsx | AppConfig 功能开关 | setConfig |
+| `/race` | Race.tsx | 赛事成绩录入 | submitRaceResult + listEnrollmentsByContent |
+| `/admins` | Admins.tsx | 管理员账号 + 登录日志（V0.2.8） | listAdmins/createAdmin/updateAdmin/adminLoginLogs |
+
+**44/44 wrapper 全对齐后端 admin 44 action**（V0.3.29 整理收官）
+
 ## 目录
 
 ```
@@ -40,19 +71,132 @@ qm-admin/
 ├── config/
 │   └── config.ts          # Umi 配置（路由 / proxy / 插件）
 ├── src/
-│   ├── app.tsx            # 运行时配置（getInitialState / request / layout）
-│   ├── access.ts          # 权限矩阵（当前简单粗暴：有 token 就放行）
-│   ├── types/             # 全局类型（app + admin + mall）
-│   ├── services/          # API wrapper（api / admin / mall）
-│   ├── pages/             # 页面
+│   ├── app.tsx            # 运行时配置（getInitialState / request / layout + V0.3.5 GlobalSearch 接入）
+│   ├── access.ts          # 权限矩阵（canAdmin: token+user+isAdmin）
+│   ├── components/
+│   │   └── GlobalSearch.tsx   # V0.3.5 全局搜索（5 表 LIKE 跨表 + Debounce 300ms）
+│   ├── types/             # 全局类型（app + admin + mall，admin 600+ 行对齐后端 44 action）
+│   ├── services/          # API wrapper（api + admin + mall，admin 33 wrapper 全覆盖）
+│   ├── pages/             # 19 页面（V0.3.29 Dashboard/Admins 已升级）
 │   │   ├── Login.tsx
 │   │   ├── Dashboard.tsx
+│   │   ├── Admins.tsx
+│   │   ├── ...
 │   │   └── mall/
 │   │       ├── Categories.tsx
 │   │       ├── Products.tsx
-│   │       └── Orders.tsx
+│   │       ├── Orders.tsx
+│   │       └── GroupBuys.tsx
 │   └── .umi/              # Umi 运行时（gitignore）
-├── tsconfig.json
+├── tests/                 # Vitest 78 测 / 6 文件
+├── CLAUDE.md              # 项目级 AI 上下文（V0.3.29 新建，GAP-A 关闭）
+├── .claude/index.json     # 机器可读索引
+└── package.json
+```
+
+## V0.3.29 整理 sprint（2026-07-28）
+
+**目标**：qm-admin Web 前端从「独立 demo 级 admin」升级为「与后端 admin 44 action 全对齐 + 业务可立即见效 + AI 上下文完整」
+
+**关键改动**：
+1. **types/admin.ts** +13 类型（DashboardResp / GlobalSearch / AdminRole / Create/UpdateAdmin / AdminLoginLogs / MpCategory / UploadMpMedia / SubmitMpAudit / ProductList / Export / InterpretList）
+2. **services/admin.ts** +13 wrapper（dashboard / globalSearch / createAdmin / updateAdmin / adminLoginLogs / getMpCategory / uploadMpMedia / submitMpAudit / listProducts / exportOrders / exportUsers / exportSettlement / listInterpret）
+3. **pages/Dashboard.tsx** 重写（V0.3.4 dashboard 1 API 拉全 9 字段：totalUsers/activeUsers7d/totalOrders/totalRevenueFen/paidOrders/totalCheckins/checkins30d/failedAdminLogins30d/totalInterpret）
+4. **pages/Admins.tsx** 改 wrapper + 加 adminLoginLogs Tab
+5. **components/GlobalSearch.tsx** 新建（V0.3.5 全局搜索）
+6. **app.tsx** layout actionsRender 接入 GlobalSearch
+7. **tests/services/admin.test.ts** 9 → **48** 测
+8. **CLAUDE.md** 新建 + **.claude/index.json** 新建
+
+**量化**：
+- 后端 44 action 对齐：31/44 (70.5%) → **44/44 (100%)** ✅
+- 测试：47 → **78 passed / 0 failed**
+- typecheck exit 0
+- **0 后端改动**（纯前端整理）
+
+**GAP 状态**：
+- GAP-A 项目级 AI 上下文 ✅ closed（CLAUDE.md + index.json）
+- GAP-B services/types 深度重构 ⚠️ open（拆 7 文件待办）
+- GAP-C page test 覆盖率 ⚠️ open（19 page 仅 2 page 有测）
+- GAP-D dist/ rebuild ⚠️ open（已 12 天未 build）
+- GAP-E ESLint + Prettier ⚠️ open
+- GAP-F CI 接入 vitest ⚠️ open
+- GAP-G funcs% 实测 ⚠️ open（baseline 未跑）
+
+## 后端契约
+
+所有写操作走 `POST /api/admin`：
+
+```ts
+{
+  action: 'upsertProduct' | 'listOrders' | 'dashboard' | 'globalSearch' | ...,
+  payload: { ... }
+}
+```
+
+后端鉴权：JWT → 后端 checkPermission middleware → super-admin/admin/operator 三角色 RBAC（V0.2.8）。
+完整契约见 [apps/server/src/modules/admin/CLAUDE.md](https://github.com/changzhi777/QM-WX/blob/main/apps/server/src/modules/admin/CLAUDE.md)。
+
+## 品牌色
+
+`#0FAF8E`（青沐绿）— 与小程序统一。已在 `app.tsx` 的 layout token 注入顶栏。
+
+## 部署
+
+### 本地 Docker 构建验证
+
+```bash
+# 1. 多阶段构建（node:20 build → nginx:1.27-alpine serve）
+docker build -t qm-admin:dev .
+
+# 2. 跑起来（映射到本机 18080）
+docker run -d --rm --name qm-admin-test -p 18080:80 qm-admin:dev
+
+# 3. 访问 http://localhost:18080
+#    SPA 任意深路径都会 fallback 到 index.html
+#    /api/* 默认反代到 host.docker.internal:3000（本地后端）
+
+# 4. 停
+docker stop qm-admin-test
+```
+
+### 上 ECS / CT400 LXC
+
+后端地址若不是 `host.docker.internal:3000`，编辑 [deploy/nginx.conf](./deploy/nginx.conf) 改 `proxy_pass`：
+
+```nginx
+location /api/ {
+    proxy_pass http://your-backend-host:3000;
+    ...
+}
+```
+
+或者跑容器时挂卷覆盖：
+
+```bash
+docker run -d --restart=always --name qm-admin \
+  -p 80:80 \
+  -v /etc/qm-admin/nginx.conf:/etc/nginx/conf.d/qm-admin.conf:ro \
+  qm-admin:prod
+```
+
+### 镜像优化要点
+
+- **多阶段构建**：node:20 跑 build，最终镜像基于 nginx-alpine（~20MB）
+- **.dockerignore** 排除 `node_modules` / `.umi` / `dist`，避免 build context 膨胀
+- **首次必跑 `max setup`**：Dockerfile 已固化（生成 `src/.umi/exports.ts`）
+- **HEALTHCHECK** 内置（30s 间隔 wget `/`）
+- **gzip + 1y 静态资源缓存**：nginx 配置已开
+
+## CI（Gitea Actions）
+
+`.gitea/workflows/ci.yml` 已就位：
+
+| Job | 触发 | 内容 |
+| --- | --- | --- |
+| `lint-typecheck` | push/PR/手动 | install → max setup → tsc --noEmit |
+| `build` | push/PR/手动 | install → max setup → max build，产物 upload artifact |
+| `docker-image` | 仅 main 分支 push | build & push 到 Gitea Container Registry |
 └── package.json
 ```
 

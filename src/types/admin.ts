@@ -495,3 +495,171 @@ export interface AdminListItem {
   disabled: boolean;
   createdAt: string;
 }
+
+/** V0.3.4 admin MIS dashboard — 1 API 拉全 9 字段
+ * 与后端 apps/server/src/modules/admin/admin.service.ts AdminDashboardData 对齐 */
+export interface DashboardResp {
+  totalUsers: number;
+  activeUsers7d: number;
+  totalOrders: number;
+  totalRevenueFen: number; // CNY 分
+  paidOrders: number;
+  totalCheckins: number;
+  checkins30d: number;
+  failedAdminLogins30d: number;
+  totalInterpret: number;
+}
+
+/** V0.3.5 admin.globalSearch 全局搜索 */
+export interface GlobalSearchResultItem {
+  type: 'user' | 'feed' | 'comment' | 'interpret' | 'strength';
+  id: string;
+  title: string;
+  snippet: string;
+  link?: string;
+}
+export interface GlobalSearchReq {
+  query: string;
+  limit?: number;
+}
+export interface GlobalSearchResp {
+  results: GlobalSearchResultItem[];
+}
+
+/** V0.2.8 RBAC 管理员增删改查 */
+export type AdminRole = 'super-admin' | 'admin' | 'operator';
+
+export interface CreateAdminReq {
+  username: string;
+  password: string;
+  role: AdminRole;
+  displayName?: string;
+}
+export interface CreateAdminResp {
+  id: string;
+}
+
+export interface UpdateAdminReq {
+  id: string;
+  password?: string;
+  role?: AdminRole;
+  displayName?: string;
+  disabled?: boolean;
+}
+export interface UpdateAdminResp {
+  ok: true;
+}
+
+export interface DisableAdminReq {
+  id: string;
+}
+export interface DisableAdminResp {
+  ok: true;
+}
+
+export interface AdminLoginLogItem {
+  id: string;
+  adminId: string;
+  loginAt: string;
+  ip: string | null;
+  userAgent: string | null;
+  ok: boolean;
+  failureReason: string | null;
+}
+export interface AdminLoginLogsReq {
+  page?: number;
+  pageSize?: number;
+  adminId?: string;
+}
+export interface AdminLoginLogsResp {
+  list: AdminLoginLogItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+/** V0.2.65 提审相关 */
+export interface MpCategoryItem {
+  id: number;
+  name: string;
+  /** 一级类目 */
+  firstClass?: string;
+  /** 二级类目 */
+  secondClass?: string;
+}
+export interface GetMpCategoryResp {
+  categories: MpCategoryItem[];
+}
+
+export interface UploadMpMediaReq {
+  fileBase64: string;
+  filename?: string;
+  mime?: string;
+}
+export interface UploadMpMediaResp {
+  mediaId: string;
+  type: string;
+  url?: string;
+}
+
+export interface SubmitMpAuditReq {
+  itemList: unknown[];
+  previewInfo?: unknown;
+  versionDesc?: string;
+  feedbackInfo?: string;
+  privacyInfo?: unknown;
+}
+export interface SubmitMpAuditResp {
+  auditId: string;
+}
+
+/** listProducts 商品列表（admin） */
+export interface ProductListReq {
+  page?: number;
+  pageSize?: number;
+  status?: 'on' | 'off';
+  category?: string;
+}
+export interface ProductListItem {
+  id: string;
+  name: string;
+  category: string;
+  brand: string | null;
+  price: string;
+  originalPrice: string | null;
+  stock: number;
+  status: 'on' | 'off';
+  createdAt: string;
+}
+export interface ProductListResp {
+  list: ProductListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+/** CSV 导出请求（admin） */
+export interface ExportOrdersReq extends OrderListReq {
+  format: 'csv';
+}
+export interface ExportUsersReq extends UserListReq {
+  format: 'csv';
+}
+export interface ExportSettlementReq {
+  yearMonth: string; // YYYY-MM
+  format: 'csv';
+}
+
+/** listInterpret 解读管理（V0.2.37 qm-admin） */
+export interface InterpretListReq {
+  type?: string;
+  userId?: string;
+  page?: number;
+  pageSize?: number;
+}
+export interface InterpretListResp {
+  list: InterpretListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}

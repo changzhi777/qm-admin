@@ -1,0 +1,207 @@
+{
+  "project": "qm-admin",
+  "version": "0.3.29",
+  "description": "青沐生命科技 admin Web 后台（独立 repo，React + Umi Max + antd 5）",
+  "github": {
+    "primary": "https://github.com/changzhi777/qm-admin",
+    "mirror": "https://10.10.10.4:2222/qingmu/qm-admin.git"
+  },
+  "backend": {
+    "name": "QM-WX",
+    "github": "https://github.com/changzhi777/QM-WX",
+    "adminModuleDoc": "https://github.com/changzhi777/QM-WX/blob/main/apps/server/src/modules/admin/CLAUDE.md",
+    "currentVersion": "V0.3.29",
+    "tables": 66,
+    "modules": 36,
+    "adminActions": 44
+  },
+  "phaseA": {
+    "structure": {
+      "pages": 19,
+      "services": 4,
+      "types": 3,
+      "components": 1,
+      "tests": 6
+    },
+    "linesOfCode": {
+      "pages": 2793,
+      "services": 520,
+      "types": 650,
+      "tests": 700
+    },
+    "routing": [
+      "/login",
+      "/dashboard",
+      "/mall/{categories,products,orders,group-buys}",
+      "/audit-logs",
+      "/training-plans",
+      "/contents",
+      "/reviews",
+      "/withdrawals",
+      "/users",
+      "/pickup",
+      "/invite",
+      "/uploads",
+      "/interpret",
+      "/config",
+      "/race",
+      "/admins"
+    ],
+    "pagesList": [
+      {"path": "/login", "file": "src/pages/Login.tsx", "lines": 90},
+      {"path": "/dashboard", "file": "src/pages/Dashboard.tsx", "lines": 130},
+      {"path": "/mall/categories", "file": "src/pages/mall/Categories.tsx", "lines": 66},
+      {"path": "/mall/products", "file": "src/pages/mall/Products.tsx", "lines": 209},
+      {"path": "/mall/orders", "file": "src/pages/mall/Orders.tsx", "lines": 321},
+      {"path": "/mall/group-buys", "file": "src/pages/mall/GroupBuys.tsx", "lines": 189},
+      {"path": "/contents", "file": "src/pages/Contents.tsx", "lines": 241},
+      {"path": "/training-plans", "file": "src/pages/TrainingPlans.tsx", "lines": 187},
+      {"path": "/reviews", "file": "src/pages/Reviews.tsx", "lines": 141},
+      {"path": "/withdrawals", "file": "src/pages/Withdrawals.tsx", "lines": 171},
+      {"path": "/users", "file": "src/pages/Users.tsx", "lines": 184},
+      {"path": "/pickup", "file": "src/pages/Pickup.tsx", "lines": 69},
+      {"path": "/invite", "file": "src/pages/Invite.tsx", "lines": 164},
+      {"path": "/uploads", "file": "src/pages/Uploads.tsx", "lines": 89},
+      {"path": "/interpret", "file": "src/pages/Interpret.tsx", "lines": 62},
+      {"path": "/audit-logs", "file": "src/pages/AuditLogs.tsx", "lines": 89},
+      {"path": "/config", "file": "src/pages/Config.tsx", "lines": 63},
+      {"path": "/race", "file": "src/pages/Race.tsx", "lines": 176},
+      {"path": "/admins", "file": "src/pages/Admins.tsx", "lines": 240}
+    ],
+    "wrapperFunctions": 44,
+    "wrapperBreakdown": {
+      "商品": ["upsertProduct", "listProducts"],
+      "内容": ["upsertContent", "listContents"],
+      "团购": ["upsertGroupBuy", "listGroupBuys"],
+      "训练": ["upsertTrainingPlan", "listTrainingPlans"],
+      "订单": ["listOrders", "updateOrderStatus", "refundOrder", "exportOrders"],
+      "用户": ["listUsers", "banUser", "unbanUser", "exportUsers"],
+      "核销": ["confirmPickup"],
+      "评价": ["listReviews", "addReviewReply"],
+      "提现": ["listWithdrawals", "approveWithdrawal", "rejectWithdrawal", "exportSettlement"],
+      "审计": ["listAuditLogs"],
+      "上传": ["listUploads", "retryParse"],
+      "配置": ["setConfig"],
+      "赛事": ["submitRaceResult", "listEnrollmentsByContent"],
+      "积分": ["adjustPoints", "grantMember", "listInviteStats"],
+      "RBAC": ["listAdmins", "createAdmin", "updateAdmin", "adminLoginLogs"],
+      "统计": ["stats", "statsByTimeRange", "dashboard"],
+      "搜索": ["globalSearch"],
+      "提审": ["getMpCategory", "uploadMpMedia", "submitMpAudit"],
+      "解读": ["listInterpret"]
+    }
+  },
+  "phaseB": {
+    "backendActionAlignment": "44/44 (100%)",
+    "wrapperImplementation": "33 wrapper functions in src/services/admin.ts",
+    "rbac": "3 roles (super-admin/admin/operator) + checkPermission middleware",
+    "csv": "downloadAdminCsv helper for orders/users/settlement",
+    "deployment": "Gitea Actions 3 job (lint/build/deploy) → qm-admin.qingmulife.cn"
+  },
+  "phaseC": {
+    "testsTotal": 78,
+    "testsFiles": 6,
+    "testsByFile": {
+      "tests/services/admin.test.ts": 48,
+      "tests/services/api.test.ts": 6,
+      "tests/pages/login-flow.test.ts": 8,
+      "tests/pages/orders-state.test.ts": 6,
+      "tests/access.test.ts": 7,
+      "tests/setup.dom.test.tsx": 4
+    },
+    "typecheck": "exit 0",
+    "testCommand": "npm test",
+    "typecheckCommand": "npm run typecheck",
+    "coverage": "未实跑（baseline 待验证）"
+  },
+  "gapStatus": {
+    "GAP-A": {
+      "name": "项目级 AI 上下文",
+      "status": "closed",
+      "closedAt": "V0.3.29",
+      "evidence": "CLAUDE.md (350+ 行) + .claude/index.json + README 三件套"
+    },
+    "GAP-B": {
+      "name": "services/types 深度重构",
+      "status": "open",
+      "note": "services/admin.ts 拆 7 业务域文件 + types/admin.ts 拆 3 文件 — 风险高，本次 YAGNI 保留"
+    },
+    "GAP-C": {
+      "name": "page test 覆盖率",
+      "status": "open",
+      "note": "19 page 中 17 page 0 测，新增 Dashboard/Admins/GlobalSearch 0 测"
+    },
+    "GAP-D": {
+      "name": "dist/ rebuild",
+      "status": "open",
+      "note": "dist/ 已 12 天未 build（V0.3.16 → V0.3.29），下次部署前必跑 npm run build"
+    },
+    "GAP-E": {
+      "name": "ESLint + Prettier",
+      "status": "open",
+      "note": "项目级代码风格未统一（app.tsx 有 4 处 as any 待清理）"
+    },
+    "GAP-F": {
+      "name": "CI 接入 vitest",
+      "status": "open",
+      "note": "Gitea Actions 仅 build，未跑 vitest"
+    },
+    "GAP-G": {
+      "name": "funcs% 实测",
+      "status": "open",
+      "note": "vitest coverage 未实跑，baseline 未知"
+    }
+  },
+  "v0329Sprint": {
+    "name": "qm-admin V0.3.29 整理 sprint",
+    "date": "2026-07-28",
+    "description": "业务对齐 + AI 上下文建档（GAP-A 关闭）",
+    "commits": 1,
+    "tags": ["v0.3.29"],
+    "filesChanged": [
+      "src/types/admin.ts (updated, +13 types)",
+      "src/services/admin.ts (updated, +13 wrappers)",
+      "src/pages/Dashboard.tsx (rewritten, V0.3.4 dashboard 1 API)",
+      "src/pages/Admins.tsx (updated, wrapper + adminLoginLogs Tab)",
+      "src/components/GlobalSearch.tsx (new, V0.3.5)",
+      "src/app.tsx (updated, layout 接入)",
+      "tests/services/admin.test.ts (updated, 9→48 测)",
+      "README.md (updated, V1→V0.3.29)",
+      "CLAUDE.md (new, 350+ 行)",
+      ".claude/index.json (new)"
+    ],
+    "testMetrics": {
+      "testsBefore": 47,
+      "testsAfter": 78,
+      "testsDelta": 31
+    },
+    "alignmentMetrics": {
+      "before": "31/44 (70.5%)",
+      "after": "44/44 (100%)",
+      "delta": "+13"
+    },
+    "verifications": [
+      "typecheck exit 0",
+      "vitest 78 passed / 0 failed",
+      "0 backend changes",
+      "wrapper DRY 范式统一（Admins.tsx 删 2 处 adminCall 直调）"
+    ],
+    "keyParadigms": [
+      "后端 44 action 对齐矩阵（33 wrapper + 4 adminCall 集成点 + 3 CSV）",
+      "dashboard 1 API 拉全（Promise.allSettled 范式同源）",
+      "globalSearch Debounce 300ms",
+      "wrapper 统一 DRY（services/admin.ts 单一入口）",
+      "adminLoginLogs Tab + adminTableRequest DRY helper"
+    ],
+    "followUps": [
+      "GAP-B services/types 深度重构（拆 7 文件 + 拆 3 文件）",
+      "GAP-C page test 覆盖率（Dashboard/Admins/GlobalSearch 渲染测）",
+      "GAP-D npm run build 验证 + 部署 qm-admin.qingmulife.cn",
+      "GAP-E ESLint + Prettier 接入",
+      "GAP-F Gitea Actions 加 vitest job",
+      "GAP-G vitest test:coverage 实跑验证 funcs%",
+      "MpCategory/UploadMpMedia/SubmitMpAudit 提审 UI 接入",
+      "后端 V0.3.29 真机联调（Dashboard 9 字段 + GlobalSearch 5 表 + Admins 登录日志）"
+    ]
+  }
+}

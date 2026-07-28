@@ -7,6 +7,8 @@ import { adminCall } from './api';
 import type {
   ProductUpsertInput,
   ProductUpsertResp,
+  ProductListReq,
+  ProductListResp,
   OrderListReq,
   OrderListResp,
   OrderStatusUpdateReq,
@@ -53,6 +55,27 @@ import type {
   EnrollmentsResp,
   StatsByTimeRangeReq,
   StatsByTimeRangeResp,
+  DashboardResp,
+  GlobalSearchReq,
+  GlobalSearchResp,
+  CreateAdminReq,
+  CreateAdminResp,
+  UpdateAdminReq,
+  UpdateAdminResp,
+  DisableAdminReq,
+  DisableAdminResp,
+  AdminLoginLogsReq,
+  AdminLoginLogsResp,
+  GetMpCategoryResp,
+  UploadMpMediaReq,
+  UploadMpMediaResp,
+  SubmitMpAuditReq,
+  SubmitMpAuditResp,
+  ExportOrdersReq,
+  ExportUsersReq,
+  ExportSettlementReq,
+  InterpretListReq,
+  InterpretListResp,
 } from '@/types/admin';
 
 /** 商品 upsert（id 缺省 = create） */
@@ -188,4 +211,60 @@ export function listEnrollmentsByContent(contentId: string) {
 /** 时段统计（Dashboard 增强）*/
 export function statsByTimeRange(req: StatsByTimeRangeReq = {}) {
   return adminCall<StatsByTimeRangeResp>('statsByTimeRange', req);
+}
+
+/** V0.3.4 admin MIS dashboard — 1 API 拉全 9 字段（admin + super-admin） */
+export function dashboard() {
+  return adminCall<DashboardResp>('dashboard');
+}
+
+/** V0.3.5 全局搜索（5 表 LIKE 跨表） */
+export function globalSearch(req: GlobalSearchReq) {
+  return adminCall<GlobalSearchResp>('globalSearch', req);
+}
+
+/** V0.2.8 RBAC 管理员增删改查 */
+export function createAdmin(req: CreateAdminReq) {
+  return adminCall<CreateAdminResp>('createAdmin', req);
+}
+export function updateAdmin(req: UpdateAdminReq) {
+  return adminCall<UpdateAdminResp>('updateAdmin', req);
+}
+export function disableAdmin(req: DisableAdminReq) {
+  return adminCall<DisableAdminResp>('disableAdmin', req);
+}
+export function adminLoginLogs(req: AdminLoginLogsReq = {}) {
+  return adminCall<AdminLoginLogsResp>('adminLoginLogs', req);
+}
+
+/** V0.2.65 提审 API（super-admin 独占） */
+export function getMpCategory() {
+  return adminCall<GetMpCategoryResp>('getMpCategory');
+}
+export function uploadMpMedia(req: UploadMpMediaReq) {
+  return adminCall<UploadMpMediaResp>('uploadMpMedia', req);
+}
+export function submitMpAudit(req: SubmitMpAuditReq) {
+  return adminCall<SubmitMpAuditResp>('submitMpAudit', req);
+}
+
+/** V0.1.122 商品列表（admin，分页 + status/category 过滤） */
+export function listProducts(req: ProductListReq = {}) {
+  return adminCall<ProductListResp>('listProducts', req);
+}
+
+/** CSV 导出（admin） */
+export function exportOrders(req: ExportOrdersReq) {
+  return adminCall<Blob>('exportOrders', req);
+}
+export function exportUsers(req: ExportUsersReq) {
+  return adminCall<Blob>('exportUsers', req);
+}
+export function exportSettlement(req: ExportSettlementReq) {
+  return adminCall<Blob>('exportSettlement', req);
+}
+
+/** V0.2.37 interpret 列表（分页 + type/userId 过滤） */
+export function listInterpret(req: InterpretListReq = {}) {
+  return adminCall<InterpretListResp>('listInterpret', req);
 }

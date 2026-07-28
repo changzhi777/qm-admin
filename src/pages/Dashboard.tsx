@@ -1,19 +1,24 @@
 /**
- * Dashboard — 实时统计（V0.1.124 stats）+ 近 7 天趋势（V0.2.7 statsByTimeRange）
+ * Dashboard — V0.3.4 dashboard 1 API 拉全 9 字段（admin MIS）
+ * + V0.2.7 statsByTimeRange 近 7 天趋势
+ * 关键范式：「1 API 拉全」避免 N+1，与后端 admin.service.getAdminDashboard 一致
  */
 import { useEffect, useState } from 'react';
 import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
-import { Table, App as AntdApp } from 'antd';
-import { stats, statsByTimeRange } from '@/services/admin';
-import type { StatsResp, StatsByTimeRangeItem } from '@/types/admin';
+import { Table, App as AntdApp, Col, Row } from 'antd';
+import { dashboard, statsByTimeRange } from '@/services/admin';
+import type { DashboardResp, StatsByTimeRangeItem } from '@/types/admin';
+
+/** 元 → 分 显示 */
+const fenToYuan = (fen: number) => `¥${(fen / 100).toFixed(2)}`;
 
 export default function Dashboard() {
   const { message } = AntdApp.useApp();
-  const [data, setData] = useState<StatsResp | null>(null);
+  const [data, setData] = useState<DashboardResp | null>(null);
   const [range, setRange] = useState<StatsByTimeRangeItem[]>([]);
 
   useEffect(() => {
-    stats()
+    dashboard()
       .then(setData)
       .catch((e) => message.error((e as Error).message));
     statsByTimeRange({ granularity: 'day' })
@@ -23,28 +28,86 @@ export default function Dashboard() {
 
   return (
     <PageContainer
-      header={{ title: '仪表盘', subTitle: '青沐生命科技 · 大健康生活方式平台' }}
+      header={{ title: '仪表盘', subTitle: '青沐生命科技 · 大健康生活方式平台 · V0.3.4 MIS' }}
     >
-      <ProCard split="vertical">
+      {/* 用户维度 */}
+      <ProCard title="用户" split="vertical" style={{ marginBottom: 16 }}>
         <StatisticCard
-          statistic={{ title: '注册用户', value: data?.userCount ?? '—', description: '总用户数' }}
+          statistic={{ title: '总用户', value: data?.totalUsers ?? '—' }}
         />
         <StatisticCard
-          statistic={{ title: '订单总数', value: data?.orderCount ?? '—', description: '所有状态' }}
+          statistic={{
+            title: '7 日活跃',
+            value: data?.activeUsers7d ?? '—',
+            description: 'checkin/weRunRecord/strengthSession 任一',
+          }}
+        />
+      </ProCard>
+
+      {/* 订单维度 */}
+      <ProCard title="订单" split="vertical" style={{ marginBottom: 16 }}>
+        <StatisticCard
+          statistic={{
+            title: '订单总数',
+            value: data?.totalOrders ?? '—',
+            description: '所有状态',
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '已支付订单',
+            value: data?.paidOrders ?? '—',
+          }}
         />
         <StatisticCard
           statistic={{
             title: '已支付收入',
-            value: data ? `¥${data.paidRevenue.toFixed(2)}` : '—',
-            description: 'paid 订单 payAmount 汇总',
+            value: data ? fenToYuan(data.totalRevenueFen) : '—',
+            description: 'paid 订单 payAmount 汇总（元）',
           }}
-        />
-        <StatisticCard
-          statistic={{ title: '运动打卡', value: data?.checkinCount ?? '—', description: '总打卡数' }}
         />
       </ProCard>
 
-      <ProCard title="近 7 天趋势（statsByTimeRange V0.2.7）" style={{ marginTop: 16 }}>
+      {/* 打卡维度 */}
+      <ProCard title="运动" split="vertical" style={{ marginBottom: 16 }}>
+        <StatisticCard
+          statistic={{
+            title: '总打卡',
+            value: data?.totalCheckins ?? '—',
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '近 30 天打卡',
+            value: data?.checkins30d ?? '—',
+          }}
+        />
+      </ProCard>
+
+      {/* 异常告警 */}
+      <ProCard title="告警" split="vertical" style={{ marginBottom: 16 }}>
+        <StatisticCard
+          statistic={{
+            title: '30 天管理员登录失败',
+            value: data?.failedAdminLogins30d ?? '—',
+            description: '超过 10 需排查安全',
+            valueStyle:
+              data && data.failedAdminLogins30d > 10
+                ? { color: '#cf1322' }
+                : undefined,
+          }}
+        />
+        <StatisticCard
+          statistic={{
+            title: '总解读次数',
+            value: data?.totalInterpret ?? '—',
+            description: 'minimax M3 / GLM-4.6V',
+          }}
+        />
+      </ProCard>
+
+      {/* 近 7 天趋势 */}
+      <ProCard title="近 7 天趋势（statsByTimeRange V0.2.7）" style={{ marginBottom: 16 }}>
         <Table<StatsByTimeRangeItem>
           rowKey="bucket"
           dataSource={range}
@@ -59,14 +122,31 @@ export default function Dashboard() {
         />
       </ProCard>
 
-      <ProCard title="管理模块导航" style={{ marginTop: 16 }}>
-        <ul>
-          <li><strong>商城</strong>：商品分类 / 商品管理 / 订单管理 / 团购管理</li>
-          <li><strong>运营</strong>：内容管理 / 评价管理 / 提现管理 / 用户管理 / 自提核销</li>
-          <li><strong>系统</strong>：训练计划 / 审计日志 / 配置管理</li>
-          <li><strong>V0.2.7 新增</strong>：邀请裂变管理 / 上传管理 / 赛事成绩</li>
-          <li>共 17 个管理模块，覆盖后端 27+ admin actions（V0.2.7 对齐）</li>
-        </ul>
+      {/* 管理模块导航 */}
+      <ProCard title="管理模块导航">
+        <Row gutter={[16, 8]}>
+          <Col span={8}>
+            <strong>商城</strong>：商品分类 / 商品管理 / 订单管理 / 团购管理
+          </Col>
+          <Col span={8}>
+            <strong>运营</strong>：内容管理 / 评价管理 / 提现管理 / 用户管理 / 自提核销
+          </Col>
+          <Col span={8}>
+            <strong>系统</strong>：训练计划 / 审计日志 / 配置管理
+          </Col>
+          <Col span={8}>
+            <strong>V0.2.7 新增</strong>：邀请裂变管理 / 上传管理 / 赛事成绩
+          </Col>
+          <Col span={8}>
+            <strong>V0.3.4 新增</strong>：Dashboard MIS 1 API 拉全 9 字段
+          </Col>
+          <Col span={8}>
+            <strong>V0.3.5 新增</strong>：顶部 globalSearch 5 表 LIKE 跨表
+          </Col>
+          <Col span={24}>
+            共 19 个管理模块，覆盖后端 44 个 admin actions（V0.3.4 全对齐）
+          </Col>
+        </Row>
       </ProCard>
     </PageContainer>
   );

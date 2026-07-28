@@ -8,6 +8,7 @@
 import type { RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
 import { LogoutOutlined } from '@ant-design/icons';
 import { history } from '@umijs/max';
+import GlobalSearch from '@/components/GlobalSearch';
 import type { InitialState } from '@/types/app';
 
 /** Max 约定：返回值即为 initialState */
@@ -43,6 +44,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       title: s?.user?.nickname ?? s?.user?.openid?.slice(0, 8) ?? 'admin',
     },
     actionsRender: () => [
+      <GlobalSearch key="global-search" />,
       <a
         key="logout"
         onClick={() => {

@@ -1,12 +1,23 @@
 /**
- * 管理员账号管理（V0.2.8，super-admin only）— listAdmins + createAdmin + updateAdmin
- * RBAC：仅 super-admin 可访问（后端 checkPermission 守卫 + 前端 super-admin 可见路由）
+ * 管理员账号管理（V0.2.8 super-admin only + V0.3.5 adminLoginLogs 登录日志）
+ * - 列表 + 新建 + 编辑 + 登录日志 Tab
+ * - 用 services/admin wrapper（DRY），不再 adminCall 直调
  */
 import { useState } from 'react';
 import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components';
-import { Button, Modal, Form, Input, Select, Tag, Switch, App as AntdApp } from 'antd';
-import { adminCall } from '@/services/api';
-import type { AdminListItem } from '@/types/admin';
+import {
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Tag,
+  Switch,
+  App as AntdApp,
+  Tabs,
+} from 'antd';
+import { createAdmin, updateAdmin, adminLoginLogs } from '@/services/admin';
+import type { AdminListItem, AdminLoginLogItem } from '@/types/admin';
 
 const ROLE_COLOR: Record<string, string> = {
   'super-admin': 'red',
@@ -29,7 +40,7 @@ export default function AdminsPage() {
     const v = await createForm.validateFields();
     setSubmitting(true);
     try {
-      await adminCall('createAdmin', v);
+      await createAdmin(v);
       message.success('已创建');
       setCreateOpen(false);
       createForm.resetFields();
@@ -46,7 +57,7 @@ export default function AdminsPage() {
     const v = await editForm.validateFields();
     setSubmitting(true);
     try {
-      await adminCall('updateAdmin', {
+      await updateAdmin({
         id: editTarget.id,
         role: v.role,
         disabled: v.disabled,
@@ -106,11 +117,32 @@ export default function AdminsPage() {
     },
   ];
 
+  const logColumns: ProColumns<AdminLoginLogItem>[] = [
+    { title: '管理员', dataIndex: 'adminId', width: 100, ellipsis: true },
+    {
+      title: '登录时间',
+      dataIndex: 'loginAt',
+      valueType: 'dateTime',
+      width: 180,
+      search: false,
+    },
+    { title: 'IP', dataIndex: 'ip', width: 130, search: false },
+    {
+      title: '结果',
+      dataIndex: 'ok',
+      width: 80,
+      search: false,
+      render: (_, r) =>
+        r.ok ? <Tag color="green">成功</Tag> : <Tag color="red">失败</Tag>,
+    },
+    { title: '失败原因', dataIndex: 'failureReason', ellipsis: true, search: false },
+  ];
+
   return (
     <PageContainer
       header={{
         title: '管理员账号',
-        subTitle: 'V0.2.8 RBAC（super-admin only）',
+        subTitle: 'V0.2.8 RBAC（super-admin only）+ V0.3.5 登录日志',
         extra: (
           <Button
             type="primary"
@@ -124,21 +156,56 @@ export default function AdminsPage() {
         ),
       }}
     >
-      <ProTable<AdminListItem>
-        key={reloadKey}
-        rowKey="id"
-        columns={columns}
-        search={false}
-        pagination={false}
-        request={async () => {
-          try {
-            const r = await adminCall<{ list: AdminListItem[] }>('listAdmins');
-            return { data: r.list, success: true };
-          } catch (e) {
-            message.error((e as Error).message);
-            return { data: [], success: false };
-          }
-        }}
+      <Tabs
+        defaultActiveKey="list"
+        items={[
+          {
+            key: 'list',
+            label: '管理员列表',
+            children: (
+              <ProTable<AdminListItem>
+                key={reloadKey}
+                rowKey="id"
+                columns={columns}
+                search={false}
+                pagination={false}
+                request={async () => {
+                  try {
+                    const r = await import('@/services/api').then((m) =>
+                      m.adminCall<{ list: AdminListItem[] }>('listAdmins'),
+                    );
+                    return { data: r.list, success: true };
+                  } catch (e) {
+                    message.error((e as Error).message);
+                    return { data: [], success: false };
+                  }
+                }}
+              />
+            ),
+          },
+          {
+            key: 'logs',
+            label: '登录日志',
+            children: (
+              <ProTable<AdminLoginLogItem>
+                rowKey="id"
+                columns={logColumns}
+                request={async (params) => {
+                  try {
+                    const r = await adminLoginLogs({
+                      page: (params.current as number) ?? 1,
+                      pageSize: (params.pageSize as number) ?? 20,
+                    });
+                    return { data: r.list, success: true, total: r.total };
+                  } catch (e) {
+                    message.error((e as Error).message);
+                    return { data: [], success: false, total: 0 };
+                  }
+                }}
+              />
+            ),
+          },
+        ]}
       />
       <Modal
         title="新建管理员"
