@@ -18,12 +18,23 @@ export default function Dashboard() {
   const [range, setRange] = useState<StatsByTimeRangeItem[]>([]);
 
   useEffect(() => {
+    // V0.3.31 fix：加防御性 try/catch 保护 message API
+    // 未登录态访问 /dashboard 触发 redirect → /login 时，组件 unmount
+    // + React 18 严格模式下 message API 静态方法可能 throw TypeError
+    const safeError = (e: unknown) => {
+      const msg = e instanceof Error ? e.message : String(e);
+      try {
+        message?.error?.(msg);
+      } catch {
+        /* silent — message API 失效时（如 unmount + redirect 时序） */
+      }
+    };
     dashboard()
       .then(setData)
-      .catch((e) => message.error((e as Error).message));
+      .catch(safeError);
     statsByTimeRange({ granularity: 'day' })
       .then((r) => setRange(r.list.slice(-7)))
-      .catch((e) => message.error((e as Error).message));
+      .catch(safeError);
   }, []);
 
   return (
