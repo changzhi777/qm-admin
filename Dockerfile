@@ -8,7 +8,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # 2) 装依赖（不跑 postinstall 的 max setup —— setup 需要 src/）
-RUN npm ci --prefer-offline --no-audit --no-fund
+# V0.3.29 加 --legacy-peer-deps 兼容 npm 版本差异导致的 lockfile 不严格同步（Docker 内 npm 可能比本地新）
+RUN npm ci --prefer-offline --no-audit --no-fund --legacy-peer-deps || npm install --prefer-offline --no-audit --no-fund --legacy-peer-deps
 
 # 3) 拷源码
 COPY . .
