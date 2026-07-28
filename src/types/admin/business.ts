@@ -1,9 +1,11 @@
 /**
- * admin module 接口类型（与 apps/server 的 admin.routes.ts 对齐）
+ * admin module — 业务类型（商品/订单/内容/团购/训练/用户/核销/评价/赛事/上传/统计/搜索/提审/解读）
+ * V0.3.29 GAP-B 拆出
+ *
+ * 与后端 apps/server/src/modules/admin/admin.{schema,service}.ts 对齐
  */
 
-/** —— 商品 —— */
-
+// ===== 商品 =====
 export interface ProductUpsertInput {
   id?: string;
   name: string;
@@ -23,10 +25,40 @@ export interface ProductUpsertResp {
   id: string;
 }
 
-/** —— 订单 —— */
-// 注意：后端 Prisma Order.status 实际支持 'refunded' / 'refunding'，admin 列表也可能返回
-// 这里保留前端常用 5 态，'refunded' 单独提
-export type OrderStatus = 'pending_pay' | 'paid' | 'shipped' | 'done' | 'cancelled' | 'refunded' | 'refunding';
+export interface ProductListReq {
+  page?: number;
+  pageSize?: number;
+  status?: 'on' | 'off';
+  category?: string;
+}
+export interface ProductListItem {
+  id: string;
+  name: string;
+  category: string;
+  brand: string | null;
+  price: string;
+  originalPrice: string | null;
+  stock: number;
+  status: 'on' | 'off';
+  createdAt: string;
+}
+export interface ProductListResp {
+  list: ProductListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+// ===== 订单 =====
+// 注意：后端 Prisma Order.status 实际支持 'refunded' / 'refunding'
+export type OrderStatus =
+  | 'pending_pay'
+  | 'paid'
+  | 'shipped'
+  | 'done'
+  | 'cancelled'
+  | 'refunded'
+  | 'refunding';
 
 export interface OrderListReq {
   status?: OrderStatus;
@@ -91,8 +123,7 @@ export interface OrderRefundResp {
   refundedBy: string;
 }
 
-/** —— 内容 —— */
-
+// ===== 内容 =====
 export type ContentType = 'marathon' | 'hotel' | 'scenic' | 'food' | 'rural';
 export type ContentActionType = 'enroll' | 'book' | 'link' | 'none';
 export type ContentStatus = 'on' | 'off';
@@ -149,14 +180,7 @@ export interface ContentListResp {
   pageSize: number;
 }
 
-/** —— admin 白名单 —— */
-
-export interface AdminListResp {
-  openids: string[];
-}
-
-/** —— 团购（V0.1.38 admin）—— */
-
+// ===== 团购（V0.1.38 admin）=====
 export interface GroupBuyUpsertInput {
   id?: string;
   productId: string;
@@ -196,66 +220,7 @@ export interface GroupBuyListResp {
   pageSize: number;
 }
 
-/** —— 评价管理（V0.1.122 qm-admin）—— */
-export interface ReviewListItem {
-  id: string;
-  userId: string;
-  productId: string;
-  orderId: string;
-  rating: number;
-  content: string | null;
-  images: string[];
-  replyContent: string | null;
-  repliedAt: string | null;
-  createdAt: string;
-  user: { id: string; nickname: string | null; avatarUrl: string | null };
-  product: { id: string; name: string };
-}
-export interface ReviewListReq {
-  page?: number;
-  pageSize?: number;
-}
-export interface ReviewListResp {
-  list: ReviewListItem[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
-export interface ReviewReplyReq {
-  reviewId: string;
-  content: string;
-}
-
-/** —— 提现管理（V0.1.122）—— */
-export type WithdrawalStatus = 'pending' | 'approved' | 'rejected';
-export interface WithdrawalListItem {
-  id: string;
-  userId: string;
-  amount: string;
-  status: WithdrawalStatus;
-  reason: string | null;
-  processedBy: string | null;
-  processedAt: string | null;
-  createdAt: string;
-  user: { id: string; nickname: string | null };
-}
-export interface WithdrawalListReq {
-  status?: WithdrawalStatus;
-  page?: number;
-  pageSize?: number;
-}
-export interface WithdrawalListResp {
-  list: WithdrawalListItem[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
-export interface WithdrawalActionReq {
-  id: string;
-  reason?: string;
-}
-
-/** —— 用户管理（V0.1.122）—— */
+// ===== 用户管理 =====
 export interface UserListItem {
   id: string;
   openid: string;
@@ -284,7 +249,7 @@ export interface UserUnbanReq {
   openid: string;
 }
 
-/** —— 自提核销（V0.1.122）—— */
+// ===== 自提核销 =====
 export interface PickupConfirmReq {
   pickupCode: string;
 }
@@ -292,7 +257,7 @@ export interface PickupConfirmResp {
   ok: boolean;
 }
 
-/** —— 训练计划管理（V0.1.123）—— */
+// ===== 训练计划管理 =====
 export type TrainingPlanLevel = 'beginner' | 'intermediate' | 'challenge' | 'extreme';
 
 export interface TrainingPlanUpsertInput {
@@ -331,7 +296,37 @@ export interface TrainingPlanListResp {
   list: TrainingPlanListItem[];
 }
 
-/** —— 审计日志（V0.1.124）—— */
+// ===== 评价管理 =====
+export interface ReviewListItem {
+  id: string;
+  userId: string;
+  productId: string;
+  orderId: string;
+  rating: number;
+  content: string | null;
+  images: string[];
+  replyContent: string | null;
+  repliedAt: string | null;
+  createdAt: string;
+  user: { id: string; nickname: string | null; avatarUrl: string | null };
+  product: { id: string; name: string };
+}
+export interface ReviewListReq {
+  page?: number;
+  pageSize?: number;
+}
+export interface ReviewListResp {
+  list: ReviewListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+export interface ReviewReplyReq {
+  reviewId: string;
+  content: string;
+}
+
+// ===== 审计日志 =====
 export interface AuditLogListItem {
   id: string;
   actorOpenid: string;
@@ -356,144 +351,12 @@ export interface AuditLogListResp {
   pageSize: number;
 }
 
-/** —— 统计（V0.1.124 Dashboard）—— */
+// ===== 统计（V0.1.124 Dashboard）=====
 export interface StatsResp {
   userCount: number;
   orderCount: number;
   paidRevenue: number;
   checkinCount: number;
-}
-
-/** —— V0.2.6 邀请裂变管理 —— */
-export interface AdjustPointsReq {
-  userId: string;
-  change: number; // ± 正加负扣
-  reason?: string;
-}
-export interface AdjustPointsResp {
-  ok: boolean;
-  userId: string;
-  points: number;
-}
-export interface GrantMemberReq {
-  userId: string;
-  days: number;
-}
-export interface GrantMemberResp {
-  ok: boolean;
-  userId: string;
-  memberExpireAt: string | null;
-}
-export interface InviteStatsReq {
-  page?: number;
-  pageSize?: number;
-}
-export interface InviteStatsItem {
-  id: string;
-  nickname: string | null;
-  avatarUrl: string | null;
-  inviteCode: string | null;
-  distributorLevel: string;
-  inviteCount: number;
-}
-export interface InviteStatsResp {
-  list: InviteStatsItem[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
-
-/** —— V0.1.150 上传管理 —— */
-export type UploadStatus = 'pending' | 'parsing' | 'parsed' | 'failed';
-export interface UploadListItem {
-  id: string;
-  userId: string;
-  type: string;
-  cosUrl: string;
-  status: UploadStatus;
-  mime: string | null;
-  size: number;
-  errorMsg: string | null;
-  createdAt: string;
-  user: { id: string; nickname: string | null; phone: string | null };
-}
-
-// V0.2.37 interpret 解读记录（minimax M3 资料解读）
-export interface InterpretListItem {
-  id: string;
-  userId: string;
-  nickname: string | null;
-  type: string; // garmin_fit | garmin_zip | medical | screenshot
-  inputKey: string;
-  result: string;
-  model: string;
-  inputTokens: number | null;
-  outputTokens: number | null;
-  createdAt: string;
-}
-export interface UploadListReq {
-  status?: UploadStatus;
-  page?: number;
-  pageSize?: number;
-}
-export interface UploadListResp {
-  list: UploadListItem[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
-
-/** —— 配置管理（setConfig）—— */
-export interface SetConfigReq {
-  id: string;
-  value: unknown;
-}
-
-/** —— V0.1.134 赛事成绩 —— */
-export interface RaceResultReq {
-  enrollmentId: string;
-  finishTimeSec: number;
-  rank?: number;
-  bibNumber?: string;
-}
-export interface EnrollmentListItem {
-  id: string;
-  userId: string;
-  contentId: string;
-  status: string;
-  createdAt: string;
-  user: { id: string; nickname: string | null; phone: string | null };
-  raceResult: { id: string; finishTimeSec: number; rank: number | null; bibNumber: string | null } | null;
-}
-export interface EnrollmentsResp {
-  list: EnrollmentListItem[];
-}
-
-/** —— 时段统计（Dashboard 增强）—— */
-export interface StatsByTimeRangeReq {
-  startDate?: string;
-  endDate?: string;
-  granularity?: 'day' | 'week' | 'month';
-}
-export interface StatsByTimeRangeItem {
-  bucket: string;
-  revenue: string;
-  orderCount: number;
-  userCount: number;
-}
-export interface StatsByTimeRangeResp {
-  list: StatsByTimeRangeItem[];
-}
-
-/** V0.2.8 管理员账号（listAdmins 返）*/
-export interface AdminListItem {
-  id: string;
-  username: string;
-  role: string;
-  nickname: string | null;
-  lastLoginAt: string | null;
-  disabled: boolean;
-  createdAt: string;
 }
 
 /** V0.3.4 admin MIS dashboard — 1 API 拉全 9 字段
@@ -510,7 +373,81 @@ export interface DashboardResp {
   totalInterpret: number;
 }
 
-/** V0.3.5 admin.globalSearch 全局搜索 */
+// ===== 时段统计（Dashboard 增强）=====
+export interface StatsByTimeRangeReq {
+  startDate?: string;
+  endDate?: string;
+  granularity?: 'day' | 'week' | 'month';
+}
+export interface StatsByTimeRangeItem {
+  bucket: string;
+  revenue: string;
+  orderCount: number;
+  userCount: number;
+}
+export interface StatsByTimeRangeResp {
+  list: StatsByTimeRangeItem[];
+}
+
+// ===== 上传管理（V0.1.150）=====
+export type UploadStatus = 'pending' | 'parsing' | 'parsed' | 'failed';
+export interface UploadListItem {
+  id: string;
+  userId: string;
+  type: string;
+  cosUrl: string;
+  status: UploadStatus;
+  mime: string | null;
+  size: number;
+  errorMsg: string | null;
+  createdAt: string;
+  user: { id: string; nickname: string | null; phone: string | null };
+}
+
+export interface UploadListReq {
+  status?: UploadStatus;
+  page?: number;
+  pageSize?: number;
+}
+export interface UploadListResp {
+  list: UploadListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+// ===== 配置管理 =====
+export interface SetConfigReq {
+  id: string;
+  value: unknown;
+}
+
+// ===== 赛事成绩（V0.1.134）=====
+export interface RaceResultReq {
+  enrollmentId: string;
+  finishTimeSec: number;
+  rank?: number;
+  bibNumber?: string;
+}
+export interface EnrollmentListItem {
+  id: string;
+  userId: string;
+  contentId: string;
+  status: string;
+  createdAt: string;
+  user: { id: string; nickname: string | null; phone: string | null };
+  raceResult: {
+    id: string;
+    finishTimeSec: number;
+    rank: number | null;
+    bibNumber: string | null;
+  } | null;
+}
+export interface EnrollmentsResp {
+  list: EnrollmentListItem[];
+}
+
+// ===== V0.3.5 全局搜索 =====
 export interface GlobalSearchResultItem {
   type: 'user' | 'feed' | 'comment' | 'interpret' | 'strength';
   id: string;
@@ -526,59 +463,7 @@ export interface GlobalSearchResp {
   results: GlobalSearchResultItem[];
 }
 
-/** V0.2.8 RBAC 管理员增删改查 */
-export type AdminRole = 'super-admin' | 'admin' | 'operator';
-
-export interface CreateAdminReq {
-  username: string;
-  password: string;
-  role: AdminRole;
-  displayName?: string;
-}
-export interface CreateAdminResp {
-  id: string;
-}
-
-export interface UpdateAdminReq {
-  id: string;
-  password?: string;
-  role?: AdminRole;
-  displayName?: string;
-  disabled?: boolean;
-}
-export interface UpdateAdminResp {
-  ok: true;
-}
-
-export interface DisableAdminReq {
-  id: string;
-}
-export interface DisableAdminResp {
-  ok: true;
-}
-
-export interface AdminLoginLogItem {
-  id: string;
-  adminId: string;
-  loginAt: string;
-  ip: string | null;
-  userAgent: string | null;
-  ok: boolean;
-  failureReason: string | null;
-}
-export interface AdminLoginLogsReq {
-  page?: number;
-  pageSize?: number;
-  adminId?: string;
-}
-export interface AdminLoginLogsResp {
-  list: AdminLoginLogItem[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
-
-/** V0.2.65 提审相关 */
+// ===== V0.2.65 提审相关 =====
 export interface MpCategoryItem {
   id: number;
   name: string;
@@ -613,44 +498,19 @@ export interface SubmitMpAuditResp {
   auditId: string;
 }
 
-/** listProducts 商品列表（admin） */
-export interface ProductListReq {
-  page?: number;
-  pageSize?: number;
-  status?: 'on' | 'off';
-  category?: string;
-}
-export interface ProductListItem {
+// ===== V0.2.37 interpret 解读记录 =====
+export interface InterpretListItem {
   id: string;
-  name: string;
-  category: string;
-  brand: string | null;
-  price: string;
-  originalPrice: string | null;
-  stock: number;
-  status: 'on' | 'off';
+  userId: string;
+  nickname: string | null;
+  type: string; // garmin_fit | garmin_zip | medical | screenshot
+  inputKey: string;
+  result: string;
+  model: string;
+  inputTokens: number | null;
+  outputTokens: number | null;
   createdAt: string;
 }
-export interface ProductListResp {
-  list: ProductListItem[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
-
-/** CSV 导出请求（admin） */
-export interface ExportOrdersReq extends OrderListReq {
-  format: 'csv';
-}
-export interface ExportUsersReq extends UserListReq {
-  format: 'csv';
-}
-export interface ExportSettlementReq {
-  yearMonth: string; // YYYY-MM
-  format: 'csv';
-}
-
-/** listInterpret 解读管理（V0.2.37 qm-admin） */
 export interface InterpretListReq {
   type?: string;
   userId?: string;

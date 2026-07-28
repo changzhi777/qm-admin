@@ -58,7 +58,8 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       </a>,
     ],
     onPageChange: () => {
-      const { location } = history;
+      // UmiMax 的 UmiHistory 类型未暴露 location 字段（V0.3.29 GAP-E 待清理 as any）
+      const location = (history as unknown as { location: { pathname: string } }).location;
       // 未登录访问非 /login 页面 → 跳登录
       if (!s?.token && location.pathname !== '/login') {
         history.push('/login');
@@ -69,8 +70,9 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
 
 /**
  * 全局 request 配置（基于 axios）
+ * baseURL 是 axios 字段，UmiMax RequestConfig 类型未暴露（V0.3.29 GAP-E 待清理）
  */
-export const request: RequestConfig = {
+export const request = {
   baseURL: '/api',
   timeout: 15000,
   requestInterceptors: [
@@ -112,4 +114,4 @@ export const request: RequestConfig = {
       // 静默；具体业务页弹 message
     },
   },
-};
+} as unknown as RequestConfig;
