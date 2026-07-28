@@ -3,6 +3,7 @@
  * listUploads / retryParse（COS 中转异步解析：小米/COROS/华为/佳明）
  */
 import { Button, Tag, App as AntdApp } from 'antd';
+import { safeMessageError } from '@/utils/safeMessage';
 import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components';
 import { retryParse } from '@/services/admin';
 import { adminTableRequest } from '@/services/api';
@@ -67,7 +68,7 @@ export default function UploadsPage() {
               await retryParse({ id: r.id });
               message.success('已重新入队解析');
             } catch (e) {
-              message.error((e as Error).message);
+              safeMessageError(message, e);
             }
           }}
         >

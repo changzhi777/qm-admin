@@ -17,6 +17,7 @@ import {
   type ProColumns,
 } from '@ant-design/pro-components';
 import { Button, Image, App as AntdApp } from 'antd';
+import { safeMessageError } from '@/utils/safeMessage';
 import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { listProducts, listCategories } from '@/services/mall';
 import { upsertProduct } from '@/services/admin';
@@ -95,7 +96,7 @@ export default function ProductsPage() {
             });
             return { data: resp.list, success: true, total: resp.total };
           } catch (e) {
-            message.error((e as Error).message);
+            safeMessageError(message, e);
             return { data: [], success: false, total: 0 };
           }
         }}
@@ -168,7 +169,7 @@ export default function ProductsPage() {
             actionRef.current?.reload();
             return true;
           } catch (e) {
-            message.error((e as Error).message);
+            safeMessageError(message, e);
             return false;
           }
         }}

@@ -20,6 +20,7 @@ import {
   Space,
   App as AntdApp,
 } from 'antd';
+import { safeMessageError } from '@/utils/safeMessage';
 import { upsertContent } from '@/services/admin';
 import { adminTableRequest } from '@/services/api';
 import type {
@@ -98,7 +99,7 @@ export default function ContentsPage() {
       closeModal();
       actionRef.current?.reload();
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     } finally {
       setSubmitting(false);
     }

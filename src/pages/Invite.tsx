@@ -10,6 +10,7 @@ import {
   type ProColumns,
 } from '@ant-design/pro-components';
 import { Button, Modal, Form, InputNumber, Input, Tag, App as AntdApp } from 'antd';
+import { safeMessageError } from '@/utils/safeMessage';
 import { adjustPoints, grantMember } from '@/services/admin';
 import { adminTableRequest } from '@/services/api';
 import type { InviteStatsItem } from '@/types/admin';
@@ -33,7 +34,7 @@ export default function InvitePage() {
       setPointsTarget(null);
       pointsForm.resetFields();
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     } finally {
       setSubmitting(false);
     }
@@ -49,7 +50,7 @@ export default function InvitePage() {
       setMemberTarget(null);
       memberForm.resetFields();
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     } finally {
       setSubmitting(false);
     }

@@ -18,6 +18,7 @@ import {
   Typography,
   App as AntdApp,
 } from 'antd';
+import { safeMessageError } from '@/utils/safeMessage';
 import { addReviewReply } from '@/services/admin';
 import { adminTableRequest } from '@/services/api';
 import type { ReviewListItem } from '@/types/admin';
@@ -40,7 +41,7 @@ export default function ReviewsPage() {
       replyForm.resetFields();
       actionRef.current?.reload();
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     } finally {
       setSubmitting(false);
     }

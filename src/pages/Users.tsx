@@ -19,6 +19,7 @@ import {
   Input,
   App as AntdApp,
 } from 'antd';
+import { safeMessageError } from '@/utils/safeMessage';
 import { banUser, unbanUser } from '@/services/admin';
 import { adminTableRequest, downloadAdminCsv } from '@/services/api';
 import type { UserListItem } from '@/types/admin';
@@ -42,7 +43,7 @@ export default function UsersPage() {
       banForm.resetFields();
       actionRef.current?.reload();
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     } finally {
       setActing((s) => {
         const { [targetId]: _, ...rest } = s;
@@ -58,7 +59,7 @@ export default function UsersPage() {
       message.success('已解封');
       actionRef.current?.reload();
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     } finally {
       setActing((s) => {
         const { [r.id]: _, ...rest } = s;
@@ -149,7 +150,7 @@ export default function UsersPage() {
                 await downloadAdminCsv('exportUsers', {}, `users-${Date.now()}.csv`);
                 message.success('导出成功');
               } catch (e) {
-                message.error((e as Error).message);
+                safeMessageError(message, e);
               }
             }}
           >

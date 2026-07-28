@@ -16,6 +16,7 @@ import {
   App as AntdApp,
   Tabs,
 } from 'antd';
+import { safeMessageError } from '@/utils/safeMessage';
 import { createAdmin, updateAdmin, adminLoginLogs } from '@/services/admin';
 import type { AdminListItem, AdminLoginLogItem } from '@/types/admin';
 
@@ -46,7 +47,7 @@ export default function AdminsPage() {
       createForm.resetFields();
       reload();
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     } finally {
       setSubmitting(false);
     }
@@ -68,7 +69,7 @@ export default function AdminsPage() {
       editForm.resetFields();
       reload();
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     } finally {
       setSubmitting(false);
     }
@@ -176,7 +177,7 @@ export default function AdminsPage() {
                     );
                     return { data: r.list, success: true };
                   } catch (e) {
-                    message.error((e as Error).message);
+                    safeMessageError(message, e);
                     return { data: [], success: false };
                   }
                 }}
@@ -198,7 +199,7 @@ export default function AdminsPage() {
                     });
                     return { data: r.list, success: true, total: r.total };
                   } catch (e) {
-                    message.error((e as Error).message);
+                    safeMessageError(message, e);
                     return { data: [], success: false, total: 0 };
                   }
                 }}

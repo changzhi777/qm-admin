@@ -16,6 +16,7 @@ import {
   type ProColumns,
 } from '@ant-design/pro-components';
 import { Button, App as AntdApp } from 'antd';
+import { safeMessageError } from '@/utils/safeMessage';
 import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { listProducts } from '@/services/mall';
 import { listGroupBuys, upsertGroupBuy } from '@/services/admin';
@@ -102,7 +103,7 @@ export default function GroupBuysPage() {
             });
             return { data: resp.list, success: true, total: resp.total };
           } catch (e) {
-            message.error((e as Error).message);
+            safeMessageError(message, e);
             return { data: [], success: false, total: 0 };
           }
         }}
@@ -148,7 +149,7 @@ export default function GroupBuysPage() {
             actionRef.current?.reload();
             return true;
           } catch (e) {
-            message.error((e as Error).message);
+            safeMessageError(message, e);
             return false;
           }
         }}

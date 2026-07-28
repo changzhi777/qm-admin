@@ -17,6 +17,7 @@ import {
   Typography,
   App as AntdApp,
 } from 'antd';
+import { safeMessageError } from '@/utils/safeMessage';
 import {
   approveWithdrawal,
   rejectWithdrawal,
@@ -47,7 +48,7 @@ export default function WithdrawalsPage() {
       message.success(approve ? '已通过（钱包已扣减）' : '已拒绝');
       actionRef.current?.reload();
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     } finally {
       setActing((s) => {
         const { [r.id]: _, ...rest } = s;
@@ -145,7 +146,7 @@ export default function WithdrawalsPage() {
                   );
                   message.success('结算单导出成功');
                 } catch (e) {
-                  message.error((e as Error).message);
+                  safeMessageError(message, e);
                 }
               }}
             >

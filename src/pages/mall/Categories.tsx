@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { Tag, App as AntdApp } from 'antd';
+import { safeMessageError } from '@/utils/safeMessage';
 import { listCategories } from '@/services/mall';
 import type { Category } from '@/types/mall';
 
@@ -21,7 +22,7 @@ export default function CategoriesPage() {
       const resp = await listCategories();
       setData(resp.list);
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     } finally {
       setLoading(false);
     }

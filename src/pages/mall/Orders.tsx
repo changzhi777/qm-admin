@@ -28,6 +28,7 @@ import {
   Typography,
   App as AntdApp,
 } from 'antd';
+import { safeMessageError } from '@/utils/safeMessage';
 import { listOrders, updateOrderStatus, refundOrder } from '@/services/admin';
 import { downloadAdminCsv } from '@/services/api';
 import type { OrderListItem, OrderStatus } from '@/types/admin';
@@ -98,7 +99,7 @@ export default function OrdersPage() {
       closeRefundModal();
       actionRef.current?.reload();
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     } finally {
       setTransitioning((s) => {
         const { [refundTarget.id]: _, ...rest } = s;
@@ -211,7 +212,7 @@ export default function OrdersPage() {
                     );
                     actionRef.current?.reload();
                   } catch (e) {
-                    message.error((e as Error).message);
+                    safeMessageError(message, e);
                   } finally {
                     setTransitioning((s) => {
                       const { [r.id]: _, ...rest } = s;
@@ -241,7 +242,7 @@ export default function OrdersPage() {
                 await downloadAdminCsv('exportOrders', {}, `orders-${Date.now()}.csv`);
                 message.success('导出成功');
               } catch (e) {
-                message.error((e as Error).message);
+                safeMessageError(message, e);
               }
             }}
           >
@@ -257,7 +258,7 @@ export default function OrdersPage() {
             });
             return { data: resp.list, success: true, total: resp.total };
           } catch (e) {
-            message.error((e as Error).message);
+            safeMessageError(message, e);
             return { data: [], success: false, total: 0 };
           }
         }}

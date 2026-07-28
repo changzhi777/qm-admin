@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { PageContainer } from '@ant-design/pro-components';
 import { Form, Switch, Button, Card, Typography, App as AntdApp } from 'antd';
+import { safeMessageError } from '@/utils/safeMessage';
 import { setConfig } from '@/services/admin';
 
 // 功能开关清单（与后端 feature-flags.ts 对齐）
@@ -29,7 +30,7 @@ export default function ConfigPage() {
       await setConfig({ id: 'feature_flags', value: v });
       message.success('功能开关已更新');
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     } finally {
       setSubmitting(false);
     }

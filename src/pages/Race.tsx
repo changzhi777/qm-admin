@@ -19,6 +19,7 @@ import {
   Space,
   App as AntdApp,
 } from 'antd';
+import { safeMessageError } from '@/utils/safeMessage';
 import { submitRaceResult, listEnrollmentsByContent, listContents } from '@/services/admin';
 import type { EnrollmentListItem, ContentListItem } from '@/types/admin';
 
@@ -41,7 +42,7 @@ export default function RacePage() {
       const r = await listContents({ type: 'marathon' });
       setContents(r.list);
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     }
   };
 
@@ -51,7 +52,7 @@ export default function RacePage() {
       const r = await listEnrollmentsByContent(id);
       setList(r.list);
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     } finally {
       setLoading(false);
     }
@@ -77,7 +78,7 @@ export default function RacePage() {
       form.resetFields();
       if (contentId) void loadEnrollments(contentId);
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     } finally {
       setSubmitting(false);
     }

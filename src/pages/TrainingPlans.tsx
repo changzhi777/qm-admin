@@ -19,6 +19,7 @@ import {
   InputNumber,
   App as AntdApp,
 } from 'antd';
+import { safeMessageError } from '@/utils/safeMessage';
 import { listTrainingPlans, upsertTrainingPlan } from '@/services/admin';
 import type {
   TrainingPlanListItem,
@@ -67,7 +68,7 @@ export default function TrainingPlansPage() {
       closeModal();
       actionRef.current?.reload();
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
     } finally {
       setSubmitting(false);
     }
@@ -133,7 +134,7 @@ export default function TrainingPlansPage() {
               total: resp.list.length,
             };
           } catch (e) {
-            message.error((e as Error).message);
+            safeMessageError(message, e);
             return { data: [], success: false, total: 0 };
           }
         }}

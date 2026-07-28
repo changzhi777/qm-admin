@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { PageContainer } from '@ant-design/pro-components';
 import { Input, Button, Result, App as AntdApp, Space } from 'antd';
+import { safeMessageError } from '@/utils/safeMessage';
 import { confirmPickup } from '@/services/admin';
 
 export default function PickupPage() {
@@ -25,7 +26,7 @@ export default function PickupPage() {
       message.success('核销成功');
       setCode('');
     } catch (e) {
-      message.error((e as Error).message);
+      safeMessageError(message, e);
       setSuccess(false);
     } finally {
       setSubmitting(false);
