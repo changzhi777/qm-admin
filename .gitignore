@@ -24,6 +24,10 @@ pnpm-debug.log*
 # coverage
 coverage/
 
+# qm-admin audit (V0.3.31 Python Playwright)
+.zcf/screenshots/
+.zcf/snapshots/
+
 # editor
 .vscode/
 .idea/
