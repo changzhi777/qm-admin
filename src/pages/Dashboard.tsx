@@ -6,6 +6,7 @@
 import { useEffect, useState } from 'react';
 import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
 import { Table, App as AntdApp, Col, Row, Space, Typography } from 'antd';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { dashboard, statsByTimeRange } from '@/services/admin';
 import type { DashboardResp, StatsByTimeRangeItem } from '@/types/admin';
 
@@ -139,6 +140,24 @@ export default function Dashboard() {
           }}
         />
       </ProCard>
+
+      {/* V0.3.34 A5：30 天每日趋势折线图（Recharts）*/}
+      {data?.dailyTrend && data.dailyTrend.length > 0 && (
+        <ProCard title="30 天每日趋势（V0.3.4 dashboard dailyTrend A5）" style={{ marginBottom: 16 }}>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={data.dailyTrend}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="orders" stroke="#2D9D78" name="订单数" />
+              <Line type="monotone" dataKey="newUsers" stroke="#1677ff" name="新用户" />
+              <Line type="monotone" dataKey="checkins" stroke="#fa8c16" name="打卡数" />
+            </LineChart>
+          </ResponsiveContainer>
+        </ProCard>
+      )}
 
       {/* 近 7 天趋势 */}
       <ProCard title="近 7 天趋势（statsByTimeRange V0.2.7）" style={{ marginBottom: 16 }}>

@@ -371,6 +371,13 @@ export interface DashboardResp {
   checkins30d: number;
   failedAdminLogins30d: number;
   totalInterpret: number;
+  // V0.3.34 A5：30 天每日趋势
+  dailyTrend?: Array<{
+    date: string; // YYYY-MM-DD
+    orders: number;
+    newUsers: number;
+    checkins: number;
+  }>;
 }
 
 // ===== 时段统计（Dashboard 增强）=====
