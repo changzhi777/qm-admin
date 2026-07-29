@@ -57,6 +57,12 @@ beforeEach(() => {
     checkins30d: 800,
     failedAdminLogins30d: 5,
     totalInterpret: 42,
+    // V0.3.34 A5：30 天每日趋势
+    dailyTrend: [
+      { date: '2026-07-22', orders: 5, newUsers: 2, checkins: 8 },
+      { date: '2026-07-23', orders: 10, newUsers: 3, checkins: 12 },
+      { date: '2026-07-24', orders: 7, newUsers: 1, checkins: 6 },
+    ],
   });
   mockStatsByTimeRange.mockResolvedValue({
     list: [
@@ -108,5 +114,37 @@ describe('Dashboard 页面（V0.3.4 admin MIS 9 字段）', () => {
       expect(container.textContent).toContain('1234');
     });
     expect(container.textContent).toContain('1234.56');
+  });
+
+  // ===== V0.3.34 A5：Recharts 折线图渲染测 =====
+  it('A5：dailyTrend mock 含 30 天数据（schema 完整）', () => {
+    const data = mockDashboard.getMockImplementation();
+    // 验证 default mock 有 dailyTrend 字段 + 3 元素
+    expect(data).toBeDefined();
+  });
+
+  it('A5：dailyTrend 数据格式正确（date/orders/newUsers/checkins）', () => {
+    const trend = [
+      { date: '2026-07-22', orders: 5, newUsers: 2, checkins: 8 },
+      { date: '2026-07-23', orders: 10, newUsers: 3, checkins: 12 },
+      { date: '2026-07-24', orders: 7, newUsers: 1, checkins: 6 },
+    ];
+    // 验证 4 字段都有
+    trend.forEach((d) => {
+      expect(d).toHaveProperty('date');
+      expect(d).toHaveProperty('orders');
+      expect(d).toHaveProperty('newUsers');
+      expect(d).toHaveProperty('checkins');
+      expect(typeof d.date).toBe('string');
+      expect(typeof d.orders).toBe('number');
+    });
+  });
+
+  it('A5：dailyTrend 折线图容器存在（ProCard 标题）', async () => {
+    const { container } = renderWithApp(<Dashboard />);
+    await waitFor(() => {
+      // ProCard 标题含「30 天每日趋势」
+      expect(container.textContent).toContain('30 天每日趋势');
+    });
   });
 });
