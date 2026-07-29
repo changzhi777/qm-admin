@@ -16,6 +16,7 @@ import type {
   ReviewListResp,
   ReviewReplyReq,
   ExportUsersReq,
+  UserDetailResp,
 } from '@/types/admin';
 
 /** V0.1.122 用户列表 */
@@ -51,4 +52,8 @@ export function addReviewReply(req: ReviewReplyReq) {
 /** CSV 导出用户 */
 export function exportUsers(req: ExportUsersReq) {
   return adminCall<Blob>('exportUsers', req);
+}
+/** V0.3.34 A2：admin.users 详情页（5 维聚合）*/
+export function getUserDetail(userId: string) {
+  return adminCall<UserDetailResp>('getUserDetail', { userId });
 }

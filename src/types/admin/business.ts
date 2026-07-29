@@ -523,3 +523,43 @@ export interface InterpretListResp {
   page: number;
   pageSize: number;
 }
+// ===== V0.3.34 A2：admin.users 详情页（5 维聚合）=====
+export interface UserDetailResp {
+  user: {
+    id: string;
+    openid: string;
+    nickname: string | null;
+    phone: string | null;
+    points: number;
+    isBanned: boolean;
+    bannedReason: string | null;
+    memberExpireAt: string | null;
+    createdAt: string;
+  };
+  training: {
+    checkinCount30d: number;
+    distanceKm30d: number;
+    strengthSessions30d: number;
+  };
+  orders: {
+    total: number;
+    paid: number;
+    totalRevenueFen: number;
+  };
+  points: {
+    current: number;
+    recentTransactions: Array<{
+      id: string;
+      change: number;
+      type: string;
+      reason: string | null;
+      createdAt: string;
+    }>;
+  };
+  auditLogs: Array<{
+    id: string;
+    action: string;
+    target: string;
+    createdAt: string;
+  }>;
+}
