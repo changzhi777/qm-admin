@@ -19,6 +19,8 @@ import type {
   SubmitMpAuditResp,
   InterpretListReq,
   InterpretListResp,
+  NutritionBalanceReq,
+  NutritionBalanceResp,
 } from '@/types/admin';
 
 /** V0.1.124 Dashboard 统计（旧版，4 字段） */
@@ -59,4 +61,9 @@ export function submitMpAudit(req: SubmitMpAuditReq) {
 /** V0.2.37 interpret 列表（分页 + type/userId 过滤） */
 export function listInterpret(req: InterpretListReq = {}) {
   return adminCall<InterpretListResp>('listInterpret', req);
+}
+
+/** V0.3.35 boohee×运动 营养×运动平衡聚合（admin 验证 boohee API 落地） */
+export function getNutritionBalance(req: NutritionBalanceReq) {
+  return adminCall<NutritionBalanceResp>('nutritionBalance', req);
 }

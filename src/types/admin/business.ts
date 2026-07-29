@@ -232,6 +232,7 @@ export interface UserListItem {
   createdAt: string;
 }
 export interface UserListReq {
+  keyword?: string;
   page?: number;
   pageSize?: number;
 }
@@ -569,4 +570,58 @@ export interface UserDetailResp {
     target: string;
     createdAt: string;
   }>;
+}
+
+// ===== V0.3.35 boohee×运动 营养×运动平衡聚合 =====
+export interface NutritionBalanceReq {
+  userId: string;
+  date?: string; // YYYY-MM-DD（CN 时区）
+}
+
+export interface NutritionBalanceSport {
+  checkinCount: number;
+  totalDistanceKm: number;
+  caloriesBurned: number;
+  steps: number;
+  source: 'checkin' | 'device' | 'both' | 'none';
+}
+
+export interface NutritionBalanceItem {
+  name: string;
+  calorie: number;
+  protein?: number;
+  fat?: number;
+  carb?: number;
+  booheeEnriched?: boolean;
+  gi?: number;
+  gl?: number;
+  healthLight?: number;
+}
+
+export interface NutritionBalanceMeal {
+  id: string;
+  mealType: string;
+  items: NutritionBalanceItem[];
+  totalCalorie: number;
+}
+
+export interface NutritionBalanceTotalIntake {
+  calorie: number;
+  protein: number;
+  fat: number;
+  carb: number;
+}
+
+export interface NutritionBalanceNetBalance {
+  calorie: number;
+  recommendation: string;
+}
+
+export interface NutritionBalanceResp {
+  userId: string;
+  date: string;
+  sport: NutritionBalanceSport;
+  meals: NutritionBalanceMeal[];
+  totalIntake: NutritionBalanceTotalIntake;
+  netBalance: NutritionBalanceNetBalance;
 }

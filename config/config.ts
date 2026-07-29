@@ -158,6 +158,18 @@ export default defineConfig({
       icon: 'SafetyOutlined',
       component: '@/pages/Admins',
     },
+    {
+      path: '/boohee',
+      name: '薄荷验证中心',
+      icon: 'CloudServerOutlined',
+      component: '@/pages/Boohee',
+    },
+    {
+      path: '/nutrition-balance',
+      name: '营养×运动平衡',
+      icon: 'ExperimentOutlined',
+      component: '@/pages/NutritionBalance',
+    },
   ],
   npmClient: 'npm',
 });
