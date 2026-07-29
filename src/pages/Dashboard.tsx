@@ -5,17 +5,21 @@
  */
 import { useEffect, useState } from 'react';
 import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
-import { Table, App as AntdApp, Col, Row } from 'antd';
+import { Table, App as AntdApp, Col, Row, Space, Typography } from 'antd';
 import { dashboard, statsByTimeRange } from '@/services/admin';
 import type { DashboardResp, StatsByTimeRangeItem } from '@/types/admin';
 
 /** 元 → 分 显示 */
 const fenToYuan = (fen: number) => `¥${(fen / 100).toFixed(2)}`;
 
+/** V0.3.34 A1：Dashboard 自动刷新间隔（30s 兜底 — WebSocket 是 V0.2.116 可选增强） */
+const REFRESH_INTERVAL_MS = 30_000;
+
 export default function Dashboard() {
   const { message } = AntdApp.useApp();
   const [data, setData] = useState<DashboardResp | null>(null);
   const [range, setRange] = useState<StatsByTimeRangeItem[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   useEffect(() => {
     // V0.3.31 fix：加防御性 try/catch 保护 message API
@@ -29,17 +33,36 @@ export default function Dashboard() {
         /* silent — message API 失效时（如 unmount + redirect 时序） */
       }
     };
-    dashboard()
-      .then(setData)
-      .catch(safeError);
-    statsByTimeRange({ granularity: 'day' })
-      .then((r) => setRange(r.list.slice(-7)))
-      .catch(safeError);
+
+    const loadData = () => {
+      dashboard()
+        .then((d) => {
+          setData(d);
+          setLastUpdated(new Date());
+        })
+        .catch(safeError);
+      statsByTimeRange({ granularity: 'day' })
+        .then((r) => setRange(r.list.slice(-7)))
+        .catch(safeError);
+    };
+
+    // V0.3.34 A1：首次加载 + 30s 自动刷新
+    loadData();
+    const interval = setInterval(loadData, REFRESH_INTERVAL_MS);
+    return () => clearInterval(interval);
   }, []);
 
   return (
     <PageContainer
       header={{ title: '仪表盘', subTitle: '青沐生命科技 · 大健康生活方式平台 · V0.3.4 MIS' }}
+      extra={
+        <Space>
+          <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+            最后更新：{lastUpdated ? lastUpdated.toLocaleTimeString('zh-CN') : '加载中...'}
+            {lastUpdated && ' · 每 30s 自动刷新'}
+          </Typography.Text>
+        </Space>
+      }
     >
       {/* 用户维度 */}
       <ProCard title="用户" split="vertical" style={{ marginBottom: 16 }}>
