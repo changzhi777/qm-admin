@@ -62,3 +62,7 @@ export function listGroupBuys(req: GroupBuyListReq = {}) {
 export function exportOrders(req: ExportOrdersReq) {
   return adminCall<Blob>('exportOrders', req);
 }
+/** V0.3.34 A6：admin.excel 导出（订单）*/
+export function exportOrdersExcel(req: ExportOrdersReq) {
+  return adminCall<{ filename: string; base64: string }>('exportOrdersExcel', req);
+}

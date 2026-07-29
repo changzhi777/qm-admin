@@ -22,7 +22,7 @@ import {
   approveWithdrawal,
   rejectWithdrawal,
 } from '@/services/admin';
-import { adminTableRequest, downloadAdminCsv } from '@/services/api';
+import { adminTableRequest, downloadAdminCsv, downloadAdminExcel } from '@/services/api';
 import type {
   WithdrawalListItem,
   WithdrawalStatus,
@@ -144,13 +144,27 @@ export default function WithdrawalsPage() {
                     { yearMonth: ym },
                     `settlement-${ym}.csv`,
                   );
-                  message.success('结算单导出成功');
+                  message.success('结算单 CSV 导出成功');
                 } catch (e) {
                   safeMessageError(message, e);
                 }
               }}
             >
-              导出本月结算单
+              导出本月结算单 (CSV)
+            </Button>
+            <Button
+              type="primary"
+              onClick={async () => {
+                try {
+                  const ym = new Date().toISOString().slice(0, 7);
+                  await downloadAdminExcel('exportSettlementExcel', { yearMonth: ym });
+                  message.success('结算单 Excel 导出成功');
+                } catch (e) {
+                  safeMessageError(message, e);
+                }
+              }}
+            >
+              导出本月结算单 (Excel)
             </Button>
           </Space>
         ),

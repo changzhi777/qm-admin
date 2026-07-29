@@ -106,3 +106,28 @@ export async function authCall<T = unknown>(action: string, payload?: unknown): 
     data: { action, payload: payload ?? {} },
   });
 }
+
+/**
+ * V0.3.34 A6：admin.excel 导出（base64 解码 + 下载 .xlsx）
+ * 后端返 envelope {code: 0, data: {filename, base64}}
+ * 与 downloadAdminCsv 区别：base64 编码 xlsx（不是 raw 二进制）
+ */
+export async function downloadAdminExcel(
+  action: string,
+  payload: Record<string, unknown>,
+): Promise<void> {
+  const resp = await adminCall<{ filename: string; base64: string }>(action, payload);
+  // base64 → Blob → 下载
+  const binary = atob(resp.base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  const blob = new Blob([bytes], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = resp.filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}

@@ -52,3 +52,7 @@ export function listInviteStats(req: InviteStatsReq = {}) {
 export function exportSettlement(req: ExportSettlementReq) {
   return adminCall<Blob>('exportSettlement', req);
 }
+/** V0.3.34 A6：admin.excel 导出（结算单）*/
+export function exportSettlementExcel(req: { yearMonth: string }) {
+  return adminCall<{ filename: string; base64: string }>('exportSettlementExcel', req);
+}

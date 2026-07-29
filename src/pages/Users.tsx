@@ -27,7 +27,7 @@ import {
 } from 'antd';
 import { safeMessageError } from '@/utils/safeMessage';
 import { banUser, unbanUser, getUserDetail } from '@/services/admin';
-import { adminTableRequest, downloadAdminCsv } from '@/services/api';
+import { adminTableRequest, downloadAdminCsv, downloadAdminExcel } from '@/services/api';
 import type { UserDetailResp, UserListItem } from '@/types/admin';
 
 export default function UsersPage() {
@@ -178,19 +178,35 @@ export default function UsersPage() {
         columns={columns}
         search={false}
         toolBarRender={() => [
-          <Button
-            key="export"
-            onClick={async () => {
-              try {
-                await downloadAdminCsv('exportUsers', {}, `users-${Date.now()}.csv`);
-                message.success('导出成功');
-              } catch (e) {
-                safeMessageError(message, e);
-              }
-            }}
-          >
-            导出 CSV
-          </Button>,
+          <Space key="export-buttons">
+            <Button
+              key="export-csv"
+              onClick={async () => {
+                try {
+                  await downloadAdminCsv('exportUsers', {}, `users-${Date.now()}.csv`);
+                  message.success('导出 CSV 成功');
+                } catch (e) {
+                  safeMessageError(message, e);
+                }
+              }}
+            >
+              导出 CSV
+            </Button>
+            <Button
+              key="export-excel"
+              type="primary"
+              onClick={async () => {
+                try {
+                  await downloadAdminExcel('exportUsersExcel', {});
+                  message.success('导出 Excel 成功');
+                } catch (e) {
+                  safeMessageError(message, e);
+                }
+              }}
+            >
+              导出 Excel
+            </Button>
+          </Space>,
         ]}
         request={adminTableRequest<UserListItem>('listUsers', message)}
       />

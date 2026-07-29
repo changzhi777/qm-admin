@@ -57,3 +57,8 @@ export function exportUsers(req: ExportUsersReq) {
 export function getUserDetail(userId: string) {
   return adminCall<UserDetailResp>('getUserDetail', { userId });
 }
+
+/** V0.3.34 A6：admin.excel 导出（用户）*/
+export function exportUsersExcel(req: ExportUsersReq) {
+  return adminCall<{ filename: string; base64: string }>('exportUsersExcel', req);
+}

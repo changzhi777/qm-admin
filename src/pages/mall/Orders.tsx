@@ -30,7 +30,7 @@ import {
 } from 'antd';
 import { safeMessageError } from '@/utils/safeMessage';
 import { listOrders, updateOrderStatus, refundOrder } from '@/services/admin';
-import { downloadAdminCsv } from '@/services/api';
+import { downloadAdminCsv, downloadAdminExcel } from '@/services/api';
 import type { OrderListItem, OrderStatus } from '@/types/admin';
 
 const STATUS_META: Record<OrderStatus, { text: string; color: string }> = {
@@ -235,19 +235,35 @@ export default function OrdersPage() {
         actionRef={actionRef}
         columns={columns}
         toolBarRender={() => [
-          <Button
-            key="export"
-            onClick={async () => {
-              try {
-                await downloadAdminCsv('exportOrders', {}, `orders-${Date.now()}.csv`);
-                message.success('导出成功');
-              } catch (e) {
-                safeMessageError(message, e);
-              }
-            }}
-          >
-            导出 CSV
-          </Button>,
+          <Space key="export-buttons">
+            <Button
+              key="export-csv"
+              onClick={async () => {
+                try {
+                  await downloadAdminCsv('exportOrders', {}, `orders-${Date.now()}.csv`);
+                  message.success('导出 CSV 成功');
+                } catch (e) {
+                  safeMessageError(message, e);
+                }
+              }}
+            >
+              导出 CSV
+            </Button>
+            <Button
+              key="export-excel"
+              type="primary"
+              onClick={async () => {
+                try {
+                  await downloadAdminExcel('exportOrdersExcel', {});
+                  message.success('导出 Excel 成功');
+                } catch (e) {
+                  safeMessageError(message, e);
+                }
+              }}
+            >
+              导出 Excel
+            </Button>
+          </Space>
         ]}
         request={async (params) => {
           try {
