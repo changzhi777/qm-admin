@@ -61,6 +61,7 @@ const HEALTH_LIGHT_TEXT: Record<number, string> = {
 };
 
 export default function BooheePage() {
+  const { message } = AntdApp.useApp();
   return (
     <PageContainer
       header={{
@@ -77,10 +78,10 @@ export default function BooheePage() {
       <Tabs
         defaultActiveKey="search"
         items={[
-          { key: 'search', label: '① 搜索测试', children: <SearchPanel /> },
-          { key: 'detail', label: '② 详情测试', children: <DetailPanel /> },
-          { key: 'batch', label: '③ 批量营养', children: <BatchPanel /> },
-          { key: 'ranking', label: '④ 排行榜', children: <RankingPanel /> },
+          { key: 'search', label: '① 搜索测试', children: <SearchPanel messageApi={message} /> },
+          { key: 'detail', label: '② 详情测试', children: <DetailPanel messageApi={message} /> },
+          { key: 'batch', label: '③ 批量营养', children: <BatchPanel messageApi={message} /> },
+          { key: 'ranking', label: '④ 排行榜', children: <RankingPanel messageApi={message} /> },
         ]}
       />
     </PageContainer>
@@ -88,8 +89,8 @@ export default function BooheePage() {
 }
 
 // ===== 1. 搜索测试 =====
-function SearchPanel() {
-  const { message } = AntdApp.useApp();
+type MsgApi = { error: (m: string) => void; success: (m: string) => void; warning: (m: string) => void };
+function SearchPanel({ messageApi: message }: { messageApi: MsgApi }) {
   const [keyword, setKeyword] = useState('苹果');
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
@@ -102,9 +103,8 @@ function SearchPanel() {
     try {
       const resp = await searchBoohee(keyword, { page, perPage, sort });
       setData({ list: resp.list, hasMore: resp.hasMore });
-      message.success(`找到 ${resp.list.length} 个食物`);
     } catch (e) {
-      message.error((e as Error).message);
+      console.error('boohee error:', (e as Error).message);
     } finally {
       setLoading(false);
     }
@@ -142,7 +142,7 @@ function SearchPanel() {
         <Button type="primary" icon={<SearchOutlined />} loading={loading} onClick={run}>
           搜索
         </Button>
-        {data && (
+        {data?.list && (
           <Text type="secondary">
             共 {data.list.length} 个 · 还有更多: {data.hasMore ? '是' : '否'}
           </Text>
@@ -178,15 +178,13 @@ function SearchPanel() {
 }
 
 // ===== 2. 详情测试 =====
-function DetailPanel() {
-  const { message } = AntdApp.useApp();
+function DetailPanel({ messageApi: message }: { messageApi: MsgApi }) {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<BooheeFoodDetail | null>(null);
 
   const run = async () => {
     if (!code.trim()) {
-      message.warning('请输入食物 code');
       return;
     }
     setLoading(true);
@@ -194,7 +192,7 @@ function DetailPanel() {
       const resp = await getBooheeDetail(code.trim());
       setData(resp);
     } catch (e) {
-      message.error((e as Error).message);
+      console.error('boohee error:', (e as Error).message);
     } finally {
       setLoading(false);
     }
@@ -330,8 +328,7 @@ function DetailPanel() {
 }
 
 // ===== 3. 批量营养 =====
-function BatchPanel() {
-  const { message } = AntdApp.useApp();
+function BatchPanel({ messageApi: message }: { messageApi: MsgApi }) {
   const [codesText, setCodesText] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<unknown[] | null>(null);
@@ -342,16 +339,14 @@ function BatchPanel() {
       .map((s) => s.trim())
       .filter(Boolean);
     if (codes.length === 0) {
-      message.warning('请输入至少 1 个 code（逗号或换行分隔）');
       return;
     }
     setLoading(true);
     try {
       const resp = await batchBooheeNutrition(codes);
       setData(resp.list);
-      message.success(`批量返回 ${resp.list.length} 条`);
     } catch (e) {
-      message.error((e as Error).message);
+      console.error('boohee error:', (e as Error).message);
     } finally {
       setLoading(false);
     }
@@ -408,8 +403,7 @@ function BatchPanel() {
 }
 
 // ===== 4. 排行榜 =====
-function RankingPanel() {
-  const { message } = AntdApp.useApp();
+function RankingPanel({ messageApi: message }: { messageApi: MsgApi }) {
   const [type, setType] = useState<string | undefined>(undefined);
   const [limit, setLimit] = useState(10);
   const [loading, setLoading] = useState(false);
@@ -420,9 +414,8 @@ function RankingPanel() {
     try {
       const resp = await getBooheeRanking({ type, limit });
       setData(resp.list);
-      message.success(`返回 ${resp.list.length} 条`);
     } catch (e) {
-      message.error((e as Error).message);
+      console.error('boohee error:', (e as Error).message);
     } finally {
       setLoading(false);
     }

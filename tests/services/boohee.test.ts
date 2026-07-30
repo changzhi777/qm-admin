@@ -30,7 +30,7 @@ describe('searchBoohee', () => {
   it('默认 page=1, perPage=20', async () => {
     mockRequest.mockResolvedValue({ list: [], hasMore: false, page: 1, perPage: 20 });
     await searchBoohee('苹果');
-    expect(mockRequest).toHaveBeenCalledWith('/admin', {
+    expect(mockRequest).toHaveBeenCalledWith('/boohee', {
       method: 'POST',
       data: {
         action: 'search',
@@ -42,7 +42,7 @@ describe('searchBoohee', () => {
   it('透传 sort', async () => {
     mockRequest.mockResolvedValue({ list: [], hasMore: false, page: 1, perPage: 20 });
     await searchBoohee('米饭', { sort: 'calorie_asc' });
-    expect(mockRequest).toHaveBeenCalledWith('/admin', {
+    expect(mockRequest).toHaveBeenCalledWith('/boohee', {
       method: 'POST',
       data: {
         action: 'search',
@@ -56,7 +56,7 @@ describe('getBooheeDetail', () => {
   it('透传 code', async () => {
     mockRequest.mockResolvedValue({ code: 'apple001', name: '苹果' });
     await getBooheeDetail('apple001');
-    expect(mockRequest).toHaveBeenCalledWith('/admin', {
+    expect(mockRequest).toHaveBeenCalledWith('/boohee', {
       method: 'POST',
       data: { action: 'detail', payload: { code: 'apple001' } },
     });
@@ -67,7 +67,7 @@ describe('batchBooheeNutrition', () => {
   it('透传 codes 数组', async () => {
     mockRequest.mockResolvedValue({ list: [] });
     await batchBooheeNutrition(['c1', 'c2', 'c3']);
-    expect(mockRequest).toHaveBeenCalledWith('/admin', {
+    expect(mockRequest).toHaveBeenCalledWith('/boohee', {
       method: 'POST',
       data: { action: 'batchNutrition', payload: { codes: ['c1', 'c2', 'c3'] } },
     });
@@ -78,7 +78,7 @@ describe('getBooheeRanking', () => {
   it('默认 limit=10', async () => {
     mockRequest.mockResolvedValue({ list: [] });
     await getBooheeRanking();
-    expect(mockRequest).toHaveBeenCalledWith('/admin', {
+    expect(mockRequest).toHaveBeenCalledWith('/boohee', {
       method: 'POST',
       data: { action: 'foodRanking', payload: { type: undefined, limit: 10 } },
     });
@@ -87,7 +87,7 @@ describe('getBooheeRanking', () => {
   it('透传 type + limit', async () => {
     mockRequest.mockResolvedValue({ list: [] });
     await getBooheeRanking({ type: 'calorie_low', limit: 20 });
-    expect(mockRequest).toHaveBeenCalledWith('/admin', {
+    expect(mockRequest).toHaveBeenCalledWith('/boohee', {
       method: 'POST',
       data: { action: 'foodRanking', payload: { type: 'calorie_low', limit: 20 } },
     });

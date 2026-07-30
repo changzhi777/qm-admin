@@ -61,6 +61,17 @@ export async function mallCall<T = unknown>(action: string, payload?: unknown): 
 }
 
 /**
+ * 调 /api/boohee（V0.3.35 薄荷食物数据 — 用户侧 action/payload 协议，但 admin_token 同样通过 jwtVerify）
+ * 与 adminCall 区别：path 是 /boohee 不是 /admin
+ */
+export async function booheeCall<T = unknown>(action: string, payload?: unknown): Promise<T> {
+  return request<T>('/boohee', {
+    method: 'POST',
+    data: { action, payload: payload ?? {} },
+  });
+}
+
+/**
  * CSV 导出（V0.1.124）— exportOrders/exportUsers/exportSettlement 返 raw CSV（非 envelope）
  * 直接 fetch + Blob 下载，绕过 request 拦截器
  */
