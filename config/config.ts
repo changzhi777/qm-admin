@@ -32,6 +32,10 @@ export default defineConfig({
       changeOrigin: true,
     },
   },
+  // V0.3.35 admin 子路径部署（/admin/ 反代到 8090 容器）
+  base: '/admin/',
+  publicPath: '/admin/',
+  history: { type: 'hash' }, // hash 模式更稳定：所有路由在 /#/foo，nginx 反代不用管子路径
   // 路由
   routes: [
     {
