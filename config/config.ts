@@ -170,6 +170,18 @@ export default defineConfig({
       icon: 'ExperimentOutlined',
       component: '@/pages/NutritionBalance',
     },
+    {
+      path: '/checkins',
+      name: '打卡记录',
+      icon: 'EnvironmentOutlined',
+      component: '@/pages/Checkins',
+    },
+    {
+      path: '/device-sources',
+      name: '设备数据源',
+      icon: 'ApiOutlined',
+      component: '@/pages/DeviceSources',
+    },
   ],
   npmClient: 'npm',
 });

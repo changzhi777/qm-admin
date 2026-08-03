@@ -625,3 +625,69 @@ export interface NutritionBalanceResp {
   totalIntake: NutritionBalanceTotalIntake;
   netBalance: NutritionBalanceNetBalance;
 }
+
+// ===== V0.3.35 sprint B：admin.checkins =====
+export interface AdminListCheckinsReq {
+  userId?: string;
+  sportType?: 'run' | 'hike' | 'ride' | 'other';
+  dataSource?: 'manual' | 'garmin' | 'huawei_export' | 'coros_fit' | 'sport_screenshot';
+  dateFrom?: string;
+  dateTo?: string;
+  minDistance?: number;
+  maxDistance?: number;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface AdminCheckinListItem {
+  id: string;
+  userId: string;
+  userNickname: string | null;
+  date: string;
+  distance: number;
+  durationSec: number;
+  pace: string;
+  heartRate: number;
+  sportType: string;
+  dataSource: string;
+  points: number;
+  shoeId: string;
+  createdAt: string;
+}
+
+export interface AdminListCheckinsResp {
+  list: AdminCheckinListItem[];
+  total: number;
+}
+
+// ===== V0.3.35 sprint B：admin.deviceSources =====
+export interface AdminListDeviceSourcesReq {
+  vendor?: 'garmin' | 'huawei' | 'coros' | 'vivo' | 'wechat' | 'mi' | 'ble';
+  userId?: string;
+  status?: 'bound' | 'unbound' | 'all';
+  page?: number;
+  pageSize?: number;
+}
+
+export interface AdminDeviceLast7DayItem {
+  date: string;
+  steps: number;
+  distanceM: number;
+  caloriesKcal: number;
+}
+
+export interface AdminDeviceBindingItem {
+  id: string;
+  userId: string;
+  userNickname: string | null;
+  vendor: string;
+  deviceType: string;
+  boundAt: string;
+  lastDataAt?: string;
+  last7Days: AdminDeviceLast7DayItem[];
+}
+
+export interface AdminListDeviceSourcesResp {
+  list: AdminDeviceBindingItem[];
+  total: number;
+}

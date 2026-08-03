@@ -21,6 +21,10 @@ import type {
   InterpretListResp,
   NutritionBalanceReq,
   NutritionBalanceResp,
+  AdminListCheckinsReq,
+  AdminListCheckinsResp,
+  AdminListDeviceSourcesReq,
+  AdminListDeviceSourcesResp,
 } from '@/types/admin';
 
 /** V0.1.124 Dashboard 统计（旧版，4 字段） */
@@ -66,4 +70,13 @@ export function listInterpret(req: InterpretListReq = {}) {
 /** V0.3.35 boohee×运动 营养×运动平衡聚合（admin 验证 boohee API 落地） */
 export function getNutritionBalance(req: NutritionBalanceReq) {
   return adminCall<NutritionBalanceResp>('nutritionBalance', req);
+}
+/** V0.3.35 sprint B：admin.checkins 全站打卡列表 */
+export function listCheckins(req: AdminListCheckinsReq = {}) {
+  return adminCall<AdminListCheckinsResp>('listCheckins', req);
+}
+
+/** V0.3.35 sprint B：admin.deviceSources 设备数据源 */
+export function listDeviceSources(req: AdminListDeviceSourcesReq = {}) {
+  return adminCall<AdminListDeviceSourcesResp>('listDeviceSources', req);
 }
